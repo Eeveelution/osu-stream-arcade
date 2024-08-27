@@ -16,13 +16,15 @@ using osum.Helpers;
 
 namespace osum.Support.Desktop
 {
-    public class GameWindowDesktop : GameWindow
-    {
+    public class GameWindowDesktop : GameWindow {
+        public static GameWindowDesktop Instance;
+
         /// <summary>Creates a 1280x720 window with the specified title.</summary>
         public GameWindowDesktop()
             : base(1280, 720, GraphicsMode.Default, "osu!stream")
         {
-            VSync = VSyncMode.On;
+            VSync    = VSyncMode.On;
+            Instance = this;
             //GameBase.WindowSize = new Size(960,640);
         }
 
@@ -83,6 +85,7 @@ namespace osum.Support.Desktop
                 case 'k':
                     Director.ChangeMode(OsuMode.PositioningTest);
                     break;
+                /*
                 case 'h':
                     if (ClientSize.Width == 960)
                         ClientSize = new Size(480, 320);
@@ -106,10 +109,10 @@ namespace osum.Support.Desktop
                     break;
                 case '2':
                     ClientSize = new Size(896 * 2, 414 * 2);
+                    break;*/
+                case 'l':
                     break;
-                case '3':
-                    ClientSize = new Size(2560, 1182);
-                    break;
+
                 case 'p':
                 {
                     if (Director.CurrentMode is Player)

@@ -209,6 +209,7 @@ namespace osum.Libraries.NetLib
             catch (Exception e)
             {
                 error = e;
+                processFinishedRequest();
             }
         }
 

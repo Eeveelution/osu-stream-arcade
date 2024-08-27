@@ -1,11 +1,14 @@
 ﻿using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 using osum.Audio;
 using osum.Graphics;
 using osum.Graphics.Renderers;
 using osum.Graphics.Sprites;
 using osum.Helpers;
+using osum.Input;
 using osum.Localisation;
+using osum.Support.Desktop;
 
 namespace osum.UI
 {
@@ -16,8 +19,14 @@ namespace osum.UI
 
         private NotificationStyle Style;
 
-        private pSprite okayButton;
+        internal pSprite okayButton;
         private pSprite cancelButton;
+
+        internal pText titleText, descriptionText, pinEntryText;
+
+        public delegate void PinEntryCompletedDelegate(Notification sender);
+
+        public event PinEntryCompletedDelegate PinEntryComplete;
 
         public Notification(string title, string description, NotificationStyle style, BoolDelegate action = null)
         {
@@ -28,7 +37,7 @@ namespace osum.UI
                 DimImmune = true
             };
 
-            pText titleText = new pText(title, 36, new Vector2(0, -130), new Vector2(500 * GameBase.SpriteToBaseRatio, 0), 1, true, Color4.White, true)
+            titleText = new pText(title, 36, new Vector2(0, -130), new Vector2(600 * GameBase.SpriteToBaseRatio, 0), 1, true, Color4.White, true)
             {
                 Field = FieldTypes.StandardSnapCentre,
                 Origin = OriginTypes.Centre,
@@ -37,7 +46,7 @@ namespace osum.UI
                 DimImmune = true
             };
 
-            pText descText = new pText(description, 24, new Vector2(0, -90), new Vector2(500 * GameBase.SpriteToBaseRatio, 0), 1, true, Color4.White, false)
+            descriptionText = new pText(description, 24, new Vector2(0, -90), new Vector2(600 * GameBase.SpriteToBaseRatio, 0), 1, true, Color4.White, false)
             {
                 Field = FieldTypes.StandardSnapCentre,
                 Origin = OriginTypes.TopCentre,
@@ -57,7 +66,7 @@ namespace osum.UI
             AddControls(style);
 
             Add(back);
-            Add(descText);
+            Add(descriptionText);
             Add(titleText);
         }
 
@@ -87,7 +96,7 @@ namespace osum.UI
                         additiveButton?.FadeOut(100);
                     };
 
-                    okayButton.OnClick += delegate { dismiss(true); };
+                    okayButton.OnClick += delegate { this.Dismiss(true); };
 
                     Add(okayButton);
 
@@ -123,7 +132,7 @@ namespace osum.UI
                         additiveButton?.FadeOut(100);
                     };
 
-                    okayButton.OnClick += delegate { dismiss(true); };
+                    okayButton.OnClick += delegate { this.Dismiss(true); };
 
                     Add(okayButton);
 
@@ -156,7 +165,7 @@ namespace osum.UI
                         additiveButton?.FadeOut(100);
                     };
 
-                    cancelButton.OnClick += delegate { dismiss(false); };
+                    cancelButton.OnClick += delegate { this.Dismiss(false); };
 
                     Add(cancelButton);
 
@@ -171,10 +180,119 @@ namespace osum.UI
                     Add(cancelText);
                 }
                     break;
+                case NotificationStyle.Loading: {
+                    okayButton = new pSprite(TextureManager.Load(OsuTexture.songselect_audio_preview), new Vector2(0, button_height))
+                    {
+                        Field           = FieldTypes.StandardSnapCentre,
+                        Origin          = OriginTypes.Centre,
+                        Clocking        = ClockTypes.Game,
+                        DimImmune       = true,
+                        DrawDepth       = 0.99f,
+                        HandleClickOnUp = true
+                    };
+
+                    okayButton.Transform(new TransformationF(TransformationType.Rotation, 0, MathHelper.Pi * 2, Clock.ModeTime, Clock.ModeTime + 2000) { Looping = true });
+
+                    Add(okayButton);
+                    break;
+                }
+                case NotificationStyle.PinEntry: {
+                    GameWindowDesktop.Instance.Keyboard.KeyDown += pinEntryHandler;
+
+                    pinEntryText = new pText("_ _ _ _", 24, new Vector2(0, button_height), Vector2.Zero, 1, true, Color4.White, true)
+                    {
+                        Field     = FieldTypes.StandardSnapCentre,
+                        Origin    = OriginTypes.Centre,
+                        Clocking  = ClockTypes.Game,
+                        DimImmune = true
+                    };
+
+                    Add(pinEntryText);
+
+                    break;
+                }
+                case NotificationStyle.Brief: {
+                    GameBase.Scheduler.Add(() => {
+                        this.Dismiss(true);
+                    }, 1500);
+                    break;
+                }
             }
         }
 
-        private void dismiss(bool completed)
+        internal string EnteredPin = "";
+        private  int    enteredDigits = 0;
+
+        private void pinEntryHandler(object sender, KeyboardKeyEventArgs e) {
+            switch (e.Key) {
+                case Key.Number0:
+                case Key.Keypad0:
+                    this.EnteredPin += "0";
+                    break;
+                case Key.Number1:
+                case Key.Keypad1:
+                    this.EnteredPin += "1";
+                    break;
+                case Key.Number2:
+                case Key.Keypad2:
+                    this.EnteredPin += "2";
+                    break;
+                case Key.Number3:
+                case Key.Keypad3:
+                    this.EnteredPin += "3";
+                    break;
+                case Key.Number4:
+                case Key.Keypad4:
+                    this.EnteredPin += "4";
+                    break;
+                case Key.Number5:
+                case Key.Keypad5:
+                    this.EnteredPin += "5";
+                    break;
+                case Key.Number6:
+                case Key.Keypad6:
+                    this.EnteredPin += "6";
+                    break;
+                case Key.Number7:
+                case Key.Keypad7:
+                    this.EnteredPin += "7";
+                    break;
+                case Key.Number8:
+                case Key.Keypad8:
+                    this.EnteredPin += "8";
+                    break;
+                case Key.Number9:
+                case Key.Keypad9:
+                    this.EnteredPin += "9";
+                    break;
+            }
+
+            this.enteredDigits++;
+
+            switch (this.enteredDigits) {
+                case 0:
+                    this.pinEntryText.Text = "_ _ _ _";
+                    break;
+                case 1:
+                    this.pinEntryText.Text = "X _ _ _";
+                    break;
+                case 2:
+                    this.pinEntryText.Text = "X X _ _";
+                    break;
+                case 3:
+                    this.pinEntryText.Text = "X X X _";
+                    break;
+                case 4:
+                    this.pinEntryText.Text = "X X X X";
+
+                    if (PinEntryComplete != null) {
+                        PinEntryComplete(this);
+                    }
+                    break;
+            }
+        }
+
+        internal void Dismiss(bool completed)
         {
             AudioEngine.PlaySample(OsuSamples.ButtonTap);
 
@@ -188,6 +306,10 @@ namespace osum.UI
             FadeOut(300);
             ScaleTo(0.95f, 300, EasingTypes.Out);
             RotateTo(0.05f, 300, EasingTypes.Out);
+
+            if (this.Style == NotificationStyle.PinEntry) {
+                GameWindowDesktop.Instance.Keyboard.KeyDown -= pinEntryHandler;
+            }
         }
 
         internal virtual void Display()
@@ -204,6 +326,9 @@ namespace osum.UI
     public enum NotificationStyle
     {
         Okay,
-        YesNo
+        YesNo,
+        Loading,
+        PinEntry,
+        Brief
     }
 }
