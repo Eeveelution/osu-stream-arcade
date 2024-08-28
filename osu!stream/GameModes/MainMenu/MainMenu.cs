@@ -135,7 +135,7 @@ namespace osum.GameModes.MainMenu
             additiveStream.Transform(new TransformationF(TransformationType.Fade, 1, 0, initial_display + 1200, initial_display + 2000) { Looping = true, LoopDelay = 4400 });
             spriteManager.Add(additiveStream);
 
-            osuLogoSmall = new pSprite(TextureManager.Load(OsuTexture.menu_logo), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(5, 5), 0.9f, true, Color4.White);
+            osuLogoSmall = new pSprite(TextureManager.Load(OsuTexture.menu_logo), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(5, 60), 0.9f, true, Color4.White);
             osuLogoSmall.OnClick += delegate
             {
                 if (State == MenuState.Select) {
@@ -325,17 +325,6 @@ namespace osum.GameModes.MainMenu
             if (!GameBase.HasAuth) {
                 RestartAmusementIcFading();
             }
-
-            GameBase.Instance.RunInBackground(() => {
-                lock (aicSeamlessMoveLock) {
-                    while (true) {
-                        if (this.aicLogo.Alpha <= 0.00005f) {
-                            this.aicLogo.Position = new Vector2(10, 10);
-                            return;
-                        }
-                    }
-                }
-            });
         }
 
         private void StopAmusementIcFading() {
@@ -372,27 +361,28 @@ namespace osum.GameModes.MainMenu
         }
 
         private void recreateUserDisplay() {
-            userBackground       = new pSprite(TextureManager.Load(OsuTexture.ranking_background), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(5, 150), 0.9f, true, Color4.White);
+            const int baseHeight = 220;
+            userBackground       = new pSprite(TextureManager.Load(OsuTexture.ranking_background), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(5, baseHeight), 0.9f, true, Color4.White);
             userBackground.Scale = new Vector2(0.35f, 0.2f);
             userBackground.Alpha = 0;
 
             this.spriteManager.Add(this.userBackground);
 
-            usernameText        = new pText(GameBase.ArcadeUsername, 24.0f, new Vector2(8, 155), 0.9f, true, Color4.White);
+            usernameText        = new pText(GameBase.ArcadeUsername, 24.0f, new Vector2(8, baseHeight + 5), 0.9f, true, Color4.White);
             usernameText.Origin = OriginTypes.TopLeft;
             usernameText.Field  = FieldTypes.Standard;
             usernameText.Alpha  = 0;
 
             this.spriteManager.Add(this.usernameText);
 
-            userStatsText        = new pText($"{GameBase.ArcadeStatStreams} streams\nmiddle-class rank", 12.0f, new Vector2(10, 182), 0.9f, true, Color4.White);
+            userStatsText        = new pText($"{GameBase.ArcadeStatStreams} streams\nmiddle-class rank", 12.0f, new Vector2(10, baseHeight + 32), 0.9f, true, Color4.White);
             userStatsText.Origin = OriginTypes.TopLeft;
             userStatsText.Field  = FieldTypes.Standard;
             userStatsText.Alpha  = 0;
 
             this.spriteManager.Add(this.userStatsText);
 
-            userRankBadge       = new pSprite(TextureManager.Load(OsuTexture.rank_b_small), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(140, 163), 0.9f, true, Color4.White);
+            userRankBadge       = new pSprite(TextureManager.Load(OsuTexture.rank_b_small), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(140, baseHeight + 12), 0.9f, true, Color4.White);
             userRankBadge.Alpha = 0;
 
             this.spriteManager.Add(userRankBadge);
@@ -443,17 +433,6 @@ namespace osum.GameModes.MainMenu
             {
                 //s.Transformations.Clear();
                 s.FadeOut(100);
-            });
-
-            GameBase.Instance.RunInBackground(() => {
-                lock (aicSeamlessMoveLock) {
-                    while (true) {
-                        if (this.aicLogo.Alpha <= 0.00005f) {
-                            this.aicLogo.Position = new Vector2(10, 160);
-                            return;
-                        }
-                    }
-                }
             });
         }
 
