@@ -571,7 +571,7 @@ namespace osum
 
                     Console.WriteLine("AIC IO: " + finishedLine);
 
-                    string[] splitCommand = finishedLine.Split(' ');
+                    string[] splitCommand = finishedLine.Split('|');
 
                     if (splitCommand.Length >= 1) {
                         switch (splitCommand[0]) {
@@ -590,8 +590,8 @@ namespace osum
                                 break;
                             case "CardData":
                                 if (splitCommand.Length >= 3) {
-                                    string cardType = splitCommand[1];
-                                    string cardId = splitCommand[2];
+                                    string cardType = splitCommand[2];
+                                    string cardId = splitCommand[3];
 
                                     string censoredCardId = cardId.Substring(0, 3);
 

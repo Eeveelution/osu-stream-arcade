@@ -257,11 +257,11 @@ namespace osum.GameModes.MainMenu
 
             Transformation fadeIn = new TransformationF(TransformationType.Fade, 0, 0.98f, Clock.ModeTime + 1300, Clock.ModeTime + 1700);
 
-            osuLogoSmall.Transform(fadeIn);
-            userBackground.Transform(fadeIn);
-            usernameText.Transform(fadeIn);
-            userRankBadge.Transform(fadeIn);
-            userStatsText.Transform(fadeIn);
+            osuLogoSmall?.Transform(fadeIn);
+            userBackground?.Transform(fadeIn);
+            usernameText?.Transform(fadeIn);
+            userRankBadge?.Transform(fadeIn);
+            userStatsText?.Transform(fadeIn);
 
             Transformation move = new TransformationV(new Vector2(0, 50), Vector2.Zero, Clock.ModeTime + 500, Clock.ModeTime + 1000, EasingTypes.In);
             fadeIn = new TransformationF(TransformationType.Fade, 0, 0.98f, Clock.ModeTime + 500, Clock.ModeTime + 1000);
