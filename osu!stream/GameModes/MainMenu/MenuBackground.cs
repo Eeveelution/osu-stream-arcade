@@ -265,11 +265,18 @@ namespace osum.GameModes.MainMenu
         private const float rotation_offset = 0.35f;
         private const float scale_offset = 4.2f;
 
+        private float oldRotation;
+        private Vector2 oldPosition, oldScaleOffset;
+
         internal void BeAwesome()
         {
             GameBase.Scheduler.Add(delegate
             {
                 whoosh?.Play();
+
+                oldScaleOffset = this.Scale;
+                oldPosition    = this.Position;
+                oldRotation    = this.Rotation;
 
                 ScaleTo(scale_offset, duration / 2, EasingTypes.InOut);
                 MoveTo(new Vector2(75, -44), duration / 2, EasingTypes.InOut);
@@ -284,6 +291,23 @@ namespace osum.GameModes.MainMenu
             UpdateStoreNotify();
 
             textSprites?.ForEach(s => s.FadeIn(500));
+        }
+
+        internal void ReverseAwesome() {
+            GameBase.Scheduler.Add(delegate
+            {
+                whoosh?.Play();
+
+                ScaleTo(this.oldScaleOffset.X, duration / 2, EasingTypes.InOut);
+                MoveTo(this.oldPosition, duration       / 2, EasingTypes.InOut);
+                RotateTo(this.oldRotation, duration / 2, EasingTypes.InOut);
+
+                rectBorder.FadeIn(duration);
+            }, 200);
+
+            this.awesomeStartTime = -1;
+
+            textSprites?.ForEach(s => s.FadeOut(500));
         }
 
         internal static void UpdateStoreNotify()

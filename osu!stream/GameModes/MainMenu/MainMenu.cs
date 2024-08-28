@@ -128,8 +128,10 @@ namespace osum.GameModes.MainMenu
             osuLogoSmall = new pSprite(TextureManager.Load(OsuTexture.menu_logo), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(5, 5), 0.9f, true, Color4.White);
             osuLogoSmall.OnClick += delegate
             {
-                if (State == MenuState.Select)
-                    Director.ChangeMode(OsuMode.MainMenu);
+                if (State == MenuState.Select) {
+                    menuBackgroundNew.ReverseAwesome();
+                    goBackToOsuLogo();
+                }
             };
             osuLogoSmall.Alpha = 0;
             spriteManager.Add(osuLogoSmall);
@@ -243,13 +245,54 @@ namespace osum.GameModes.MainMenu
 
             firstDisplay = false;
         }
+        private void goBackToOsuLogo() {
+            Transformation fadeOut = new TransformationF(TransformationType.Fade, 0.98f, 0f, Clock.ModeTime, Clock.ModeTime + 750);
+
+            osuLogoSmall?.Transform(fadeOut);
+            userBackground?.Transform(fadeOut);
+            usernameText?.Transform(fadeOut);
+            userRankBadge?.Transform(fadeOut);
+            userStatsText?.Transform(fadeOut);
+
+            Transformation move = new TransformationV(Vector2.Zero, new Vector2(0, 50), Clock.ModeTime + 500, Clock.ModeTime + 1000, EasingTypes.In);
+
+            fadeOut = new TransformationF(TransformationType.Fade, 0.98f, 0f, Clock.ModeTime + 500, Clock.ModeTime + 1000);
+            NewsButton.Transform(fadeOut);
+            NewsButton.Transform(move);
+
+
+            //osuLogo.Transformations.Clear();
+            osuLogo.Transform(new TransformationF(TransformationType.Scale,    osuLogo.ScaleScalar, osuLogo.ScaleScalar / 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
+            osuLogo.Transform(new TransformationF(TransformationType.Rotation, 0.35f,                      osuLogo.Rotation,    Clock.ModeTime, Clock.ModeTime + 1000, EasingTypes.In));
+
+            //osuLogoGloss.Transformations.Clear();
+
+
+            osuLogoGloss.Transform(new TransformationF(TransformationType.Scale, osuLogoGloss.ScaleScalar, osuLogoGloss.ScaleScalar / 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
+
+            osuLogo.FadeIn(800);
+
+            GameBase.Scheduler.Add(() => {
+                for (int i = 0; i != this.explosions.Count; i++) {
+                    this.explosions[i].FadeIn(1000);
+                }
+                osuLogoGloss.FadeIn(800);
+
+                stream.FadeIn(150);
+                additiveStream.FadeIn(150);
+            }, 1500);
+
+            State = MenuState.Logo;
+
+            osuLogo.HandleInput = true;
+        }
 
         private void osuLogo_OnClick(object sender, EventArgs e)
         {
             State = MenuState.Select;
 
             osuLogo.HandleInput = false;
-            osuLogo.Transformations.Clear();
+            //osuLogo.Transformations.Clear();
 
             AudioEngine.PlaySample(OsuSamples.MenuHit);
 
@@ -268,11 +311,11 @@ namespace osum.GameModes.MainMenu
             NewsButton.Transform(fadeIn);
             NewsButton.Transform(move);
 
-            osuLogo.Transformations.Clear();
+            //osuLogo.Transformations.Clear();
             osuLogo.Transform(new TransformationF(TransformationType.Scale, osuLogo.ScaleScalar, osuLogo.ScaleScalar * 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
             osuLogo.Transform(new TransformationF(TransformationType.Rotation, osuLogo.Rotation, 0.35f, Clock.ModeTime, Clock.ModeTime + 1000, EasingTypes.In));
 
-            osuLogoGloss.Transformations.Clear();
+            //osuLogoGloss.Transformations.Clear();
             osuLogoGloss.FadeOut(200);
             osuLogoGloss.Transform(new TransformationF(TransformationType.Scale, osuLogoGloss.ScaleScalar, osuLogoGloss.ScaleScalar * 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
             stream.FadeOut(150);
@@ -282,7 +325,7 @@ namespace osum.GameModes.MainMenu
 
             explosions.ForEach(s =>
             {
-                s.Transformations.Clear();
+                //s.Transformations.Clear();
                 s.FadeOut(100);
             });
         }
@@ -398,8 +441,8 @@ namespace osum.GameModes.MainMenu
                     menuBackgroundNew.ScaleScalar += sCh;
             }
 
-            if (State != MenuState.Select)
-                updateBeat();
+
+            updateBeat();
 
             base.Update();
             spriteManagerBehind.Update();
@@ -447,6 +490,9 @@ namespace osum.GameModes.MainMenu
             explosion.FlashColour(ColourHelper.Lighten2(explosion.Colour, 0.4f * strength), 350);
             explosion.ScaleScalar *= 1 + (0.2f * strength);
             explosion.ScaleTo(sizeForExplosion(beat), 400, EasingTypes.In);
+
+            osuLogoSmall.ScaleScalar *= 1 + (0.05f * strength);
+            osuLogoSmall.ScaleTo(1.0f, 400, EasingTypes.In);
         }
 
         private float sizeForExplosion(int beat)
