@@ -50,6 +50,14 @@ namespace osum.GameModes.MainMenu
         private pSprite osuLogo;
         private pSprite osuLogoGloss;
 
+        private       pSprite         aicLogo;
+        private       TransformationF aicLogoFadeIn, aicLogoFadeOut;
+        private       pText           aicLogoText;
+        private const int             aicLogoFadingTime = 2000;
+        private       object          aicSeamlessMoveLock = new object();
+
+        private float osuLogoOldRotation;
+
 #if iOS
         // the new version of the main menu theme is encoded in AAC, not HE-AAC.
         // without this offset, things get incorrect (especially after the first seek).
@@ -114,6 +122,8 @@ namespace osum.GameModes.MainMenu
             Transformation fadeIn = new TransformationF(TransformationType.Fade, 0, 1, initial_display, initial_display);
             spriteManager.Sprites.ForEach(s => s.Transform(fadeIn));
 
+
+
             stream = new pSprite(TextureManager.Load(OsuTexture.menu_stream), FieldTypes.StandardSnapCentre, OriginTypes.Centre, ClockTypes.Mode, new Vector2(0, 180), 0.95f, true, Color4.White);
             stream.Transform(new TransformationF(TransformationType.Fade, 0, 1, initial_display + 900, initial_display + 1300));
             spriteManager.Add(stream);
@@ -134,11 +144,37 @@ namespace osum.GameModes.MainMenu
                 }
             };
             osuLogoSmall.Alpha = 0;
+
             spriteManager.Add(osuLogoSmall);
 
+            aicLogo            = new pSprite(TextureManager.Load("aic_logo"), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(10, 10), 0.9f, true, Color4.White);
+            aicLogo.Scale = new Vector2(0.25f, 0.25f);
 
+            aicLogoFadeIn           = new TransformationF(TransformationType.Fade, 0.0f, 1.0f, initial_display + 900, initial_display + 900 + aicLogoFadingTime, EasingTypes.InOut);
+            aicLogoFadeIn.Looping   = true;
+            aicLogoFadeIn.LoopDelay = aicLogoFadingTime;
 
-            NewsButton = new NewsButton();
+            aicLogoFadeOut           = new TransformationF(TransformationType.Fade, 1.0f, 0.0f, initial_display + 900 + aicLogoFadingTime, initial_display + 900 + aicLogoFadingTime + aicLogoFadingTime, EasingTypes.InOut);
+            aicLogoFadeOut.Looping   = true;
+            aicLogoFadeOut.LoopDelay = aicLogoFadingTime;
+
+            spriteManager.Add(this.aicLogo);
+
+            aicLogoText = new pText("Swipe your Amusement IC Card to Login\nPlaying as guest is fine too!", 14.0f, new Vector2(60, 10), 0.9f, true, Color4.White);
+
+            if (!GameBase.HasAuth) {
+                this.aicLogo.Transformations.Clear();
+
+                aicLogo.Transform(aicLogoFadeIn);
+                aicLogo.Transform(aicLogoFadeOut);
+            } else {
+                this.aicLogo.Alpha = 0;
+                this.aicLogoText.Alpha = 0;
+            }
+
+            spriteManager.Add(this.aicLogoText);
+
+            NewsButton  = new NewsButton();
             spriteManager.Add(NewsButton);
             NewsButton.Alpha = 0;
 
@@ -263,7 +299,7 @@ namespace osum.GameModes.MainMenu
 
             //osuLogo.Transformations.Clear();
             osuLogo.Transform(new TransformationF(TransformationType.Scale,    osuLogo.ScaleScalar, osuLogo.ScaleScalar / 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
-            osuLogo.Transform(new TransformationF(TransformationType.Rotation, 0.35f,                      osuLogo.Rotation,    Clock.ModeTime, Clock.ModeTime + 1000, EasingTypes.In));
+            osuLogo.Transform(new TransformationF(TransformationType.Rotation, 0.35f,               osuLogoOldRotation,         Clock.ModeTime, Clock.ModeTime + 1000, EasingTypes.In));
 
             //osuLogoGloss.Transformations.Clear();
 
@@ -285,6 +321,81 @@ namespace osum.GameModes.MainMenu
             State = MenuState.Logo;
 
             osuLogo.HandleInput = true;
+
+            if (!GameBase.HasAuth) {
+                RestartAmusementIcFading();
+            }
+
+            GameBase.Instance.RunInBackground(() => {
+                lock (aicSeamlessMoveLock) {
+                    while (true) {
+                        if (this.aicLogo.Alpha <= 0.00005f) {
+                            this.aicLogo.Position = new Vector2(10, 10);
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+
+        private void StopAmusementIcFading() {
+            this.aicLogo.Transformations.ForEach(t => {
+                if (t != this.aicLogoFadeOut) t.Looping = false;
+            });
+
+            GameBase.Scheduler.Add(() => {
+                this.aicLogo.Transformations.Clear();
+                this.aicLogo.FadeOut(500);
+            }, aicLogoFadingTime);
+        }
+
+        private void RestartAmusementIcFading() {
+            aicLogoFadeIn           = new TransformationF(TransformationType.Fade, 0.0f, 1.0f, Clock.ModeTime + 900, Clock.ModeTime + 900 + aicLogoFadingTime, EasingTypes.InOut);
+            aicLogoFadeIn.Looping   = true;
+            aicLogoFadeIn.LoopDelay = aicLogoFadingTime;
+
+            aicLogoFadeOut           = new TransformationF(TransformationType.Fade, 1.0f, 0.0f, Clock.ModeTime + 900 + aicLogoFadingTime, Clock.ModeTime + 900 + aicLogoFadingTime + aicLogoFadingTime, EasingTypes.InOut);
+            aicLogoFadeOut.Looping   = true;
+            aicLogoFadeOut.LoopDelay = aicLogoFadingTime;
+
+            this.aicLogo.Transform(this.aicLogoFadeIn);
+            this.aicLogo.Transform(this.aicLogoFadeOut);
+        }
+
+        private void fadeInUserDisplay() {
+            Transformation fadeIn = new TransformationF(TransformationType.Fade, 0, 0.98f, Clock.ModeTime + 1300, Clock.ModeTime + 1700);
+
+            userBackground?.Transform(fadeIn);
+            usernameText?.Transform(fadeIn);
+            userRankBadge?.Transform(fadeIn);
+            userStatsText?.Transform(fadeIn);
+        }
+
+        private void recreateUserDisplay() {
+            userBackground       = new pSprite(TextureManager.Load(OsuTexture.ranking_background), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(5, 150), 0.9f, true, Color4.White);
+            userBackground.Scale = new Vector2(0.35f, 0.2f);
+            userBackground.Alpha = 0;
+
+            this.spriteManager.Add(this.userBackground);
+
+            usernameText        = new pText(GameBase.ArcadeUsername, 24.0f, new Vector2(8, 155), 0.9f, true, Color4.White);
+            usernameText.Origin = OriginTypes.TopLeft;
+            usernameText.Field  = FieldTypes.Standard;
+            usernameText.Alpha  = 0;
+
+            this.spriteManager.Add(this.usernameText);
+
+            userStatsText        = new pText($"{GameBase.ArcadeStatStreams} streams\nmiddle-class rank", 12.0f, new Vector2(10, 182), 0.9f, true, Color4.White);
+            userStatsText.Origin = OriginTypes.TopLeft;
+            userStatsText.Field  = FieldTypes.Standard;
+            userStatsText.Alpha  = 0;
+
+            this.spriteManager.Add(this.userStatsText);
+
+            userRankBadge       = new pSprite(TextureManager.Load(OsuTexture.rank_b_small), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(140, 163), 0.9f, true, Color4.White);
+            userRankBadge.Alpha = 0;
+
+            this.spriteManager.Add(userRankBadge);
         }
 
         private void osuLogo_OnClick(object sender, EventArgs e)
@@ -300,16 +411,19 @@ namespace osum.GameModes.MainMenu
 
             Transformation fadeIn = new TransformationF(TransformationType.Fade, 0, 0.98f, Clock.ModeTime + 1300, Clock.ModeTime + 1700);
 
-            osuLogoSmall?.Transform(fadeIn);
-            userBackground?.Transform(fadeIn);
-            usernameText?.Transform(fadeIn);
-            userRankBadge?.Transform(fadeIn);
-            userStatsText?.Transform(fadeIn);
+            this.osuLogoSmall?.Transform(fadeIn);
+
+            if (GameBase.HasAuth) {
+                this.recreateUserDisplay();
+                fadeInUserDisplay();
+            }
 
             Transformation move = new TransformationV(new Vector2(0, 50), Vector2.Zero, Clock.ModeTime + 500, Clock.ModeTime + 1000, EasingTypes.In);
             fadeIn = new TransformationF(TransformationType.Fade, 0, 0.98f, Clock.ModeTime + 500, Clock.ModeTime + 1000);
             NewsButton.Transform(fadeIn);
             NewsButton.Transform(move);
+
+            osuLogoOldRotation = this.osuLogo.Rotation;
 
             //osuLogo.Transformations.Clear();
             osuLogo.Transform(new TransformationF(TransformationType.Scale, osuLogo.ScaleScalar, osuLogo.ScaleScalar * 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
@@ -323,10 +437,23 @@ namespace osum.GameModes.MainMenu
 
             osuLogo.FadeOut(800);
 
+            //this.StopAmusementIcFading();
+
             explosions.ForEach(s =>
             {
                 //s.Transformations.Clear();
                 s.FadeOut(100);
+            });
+
+            GameBase.Instance.RunInBackground(() => {
+                lock (aicSeamlessMoveLock) {
+                    while (true) {
+                        if (this.aicLogo.Alpha <= 0.00005f) {
+                            this.aicLogo.Position = new Vector2(10, 160);
+                            return;
+                        }
+                    }
+                }
             });
         }
 
@@ -385,35 +512,30 @@ namespace osum.GameModes.MainMenu
                 this._oldAuthState = GameBase.HasAuth;
 
                 if (GameBase.HasAuth) {
-                    userBackground       = new pSprite(TextureManager.Load(OsuTexture.ranking_background), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(5, 150), 0.9f, true, Color4.White);
-                    userBackground.Scale = new Vector2(0.35f, 0.2f);
-                    userBackground.Alpha = 0;
+                    this.recreateUserDisplay();
 
-                    this.spriteManager.Add(this.userBackground);
+                    GameBase.Scheduler.Add(() => {
+                       if (this.State == MenuState.Logo) {
+                           osuLogo_OnClick(null, null);
+                       }
+                    }, 2000);
 
-                    usernameText        = new pText(GameBase.ArcadeUsername, 24.0f, new Vector2(8, 155), 0.9f, true, Color4.White);
-                    usernameText.Origin = OriginTypes.TopLeft;
-                    usernameText.Field  = FieldTypes.Standard;
-                    usernameText.Alpha  = 0;
+                    GameBase.Scheduler.Add(() => {
+                        if (this.State == MenuState.Select) {
+                            fadeInUserDisplay();
+                        }
+                    }, 1500);
 
-                    this.spriteManager.Add(this.usernameText);
-
-                    userStatsText        = new pText($"{GameBase.ArcadeStatStreams} streams\nmiddle-class rank", 12.0f, new Vector2(10, 182), 0.9f, true, Color4.White);
-                    userStatsText.Origin = OriginTypes.TopLeft;
-                    userStatsText.Field  = FieldTypes.Standard;
-                    userStatsText.Alpha  = 0;
-
-                    this.spriteManager.Add(this.userStatsText);
-
-                    userRankBadge            = new pSprite(TextureManager.Load(OsuTexture.rank_b_small), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(140, 163), 0.9f, true, Color4.White);
-                    userRankBadge.Alpha      = 0;
-
-                    this.spriteManager.Add(userRankBadge);
-
-                    GameBase.Scheduler.Add((() => osuLogo_OnClick(null, null)), 2000);
+                    this.StopAmusementIcFading();
                 } else {
                     Transformation fadeOut = new TransformationF(TransformationType.Fade, 0.98f, 0.0f, Clock.ModeTime + 1300, Clock.ModeTime + 1700);
+
                     userBackground.Transform(fadeOut);
+                    userRankBadge.Transform(fadeOut);
+                    userStatsText.Transform(fadeOut);
+                    usernameText.Transform(fadeOut);
+
+                    this.RestartAmusementIcFading();
                 }
             }
 
@@ -500,8 +622,10 @@ namespace osum.GameModes.MainMenu
             return 0.7f - beat * 0.05f;
         }
 
-        public override bool Draw()
-        {
+        public override bool Draw() {
+            this.aicLogoText.Alpha    = this.aicLogo.Alpha;
+            this.aicLogoText.Position = this.aicLogo.Position + new Vector2(50, 0);
+
             spriteManagerBehind.Draw();
             menuBackgroundNew.Draw();
             base.Draw();
