@@ -9,6 +9,7 @@ using osum.Helpers;
 using osum.Input;
 using osum.Input.Sources;
 using osum.Localisation;
+using osum.UI;
 
 namespace osum.GameModes.Play.Components
 {
@@ -212,7 +213,19 @@ namespace osum.GameModes.Play.Components
             pSprite s = sender as pSprite;
             s.AdditiveFlash(500, 1);
 
-            Director.ChangeMode(OsuMode.SongSelect);
+            if (ArcadeUserData.CreditOver()) {
+                GameBase.Notify(new Notification(
+                "Time's over!",
+                "Your timer has expired! You can either play this map, or quit. Do you want to quit?", NotificationStyle.YesNo,
+                b => {
+                    if (b) {
+                        ArcadeUserData.CreditOverReturnCatch();
+                    }
+                }));
+            } else {
+                Director.ChangeMode(OsuMode.SongSelect);
+            }
+
             AudioEngine.PlaySample(OsuSamples.MenuBack);
         }
 
@@ -273,8 +286,14 @@ namespace osum.GameModes.Play.Components
             return FromBottom ? GameBase.BaseSizeFixedWidth.Y - point.BasePosition.Y : point.BasePosition.Y;
         }
 
+        private bool restartRemoved = false;
+
         public override void Update()
         {
+            if (ArcadeUserData.CreditOver() && !this.restartRemoved) {
+                this.spriteManager.Sprites.Remove(this.buttonRestart);
+            }
+
             if (validPoint != null && !Failed)
             {
                 if (pullnotice != null)

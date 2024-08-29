@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics;
@@ -178,6 +179,9 @@ namespace osum.Support.Desktop
         /// <param name="e">Contains timing information for framerate independent logic.</param>
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
+#if DEBUG
+            Stopwatch updateTime = Stopwatch.StartNew();
+#endif
             base.OnUpdateFrame(e);
 
             if (Keyboard[Key.Escape])
@@ -189,6 +193,11 @@ namespace osum.Support.Desktop
 
             //todo: make update happen from here.
             if (GameBase.Instance != null) GameBase.Instance.Update();
+#if DEBUG
+            updateTime.Stop();
+
+            GameBase.LastUpdateTime = ((double)updateTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
+#endif
         }
 
         /// <summary>
@@ -197,12 +206,20 @@ namespace osum.Support.Desktop
         /// <param name="e">Contains timing information.</param>
         protected override void OnRenderFrame(FrameEventArgs e)
         {
+#if DEBUG
+            Stopwatch frameTime = Stopwatch.StartNew();
+#endif
             base.OnRenderFrame(e);
 
             if (GameBase.Instance != null) GameBase.Instance.Draw();
 
             // display
             SwapBuffers();
+#if DEBUG
+            frameTime.Stop();
+
+            GameBase.LastFrameTime = ((double)frameTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
+#endif
         }
     }
 }

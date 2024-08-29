@@ -72,7 +72,7 @@ namespace osum.GameModes.MainMenu
 
         internal SpriteManager spriteManagerBehind = new SpriteManager();
 
-        private MenuState State = MenuState.Logo;
+        internal MenuState State = MenuState.Logo;
 
         private static bool firstDisplay = true;
 
@@ -122,8 +122,6 @@ namespace osum.GameModes.MainMenu
             Transformation fadeIn = new TransformationF(TransformationType.Fade, 0, 1, initial_display, initial_display);
             spriteManager.Sprites.ForEach(s => s.Transform(fadeIn));
 
-
-
             stream = new pSprite(TextureManager.Load(OsuTexture.menu_stream), FieldTypes.StandardSnapCentre, OriginTypes.Centre, ClockTypes.Mode, new Vector2(0, 180), 0.95f, true, Color4.White);
             stream.Transform(new TransformationF(TransformationType.Fade, 0, 1, initial_display + 900, initial_display + 1300));
             spriteManager.Add(stream);
@@ -139,8 +137,7 @@ namespace osum.GameModes.MainMenu
             osuLogoSmall.OnClick += delegate
             {
                 if (State == MenuState.Select) {
-                    menuBackgroundNew.ReverseAwesome();
-                    goBackToOsuLogo();
+                    this.GoBackToOsuLogo();
                 }
             };
             osuLogoSmall.Alpha = 0;
@@ -162,7 +159,7 @@ namespace osum.GameModes.MainMenu
 
             aicLogoText = new pText("Swipe your Amusement IC Card to Login\nPlaying as guest is fine too!", 14.0f, new Vector2(60, 10), 0.9f, true, Color4.White);
 
-            if (!GameBase.HasAuth) {
+            if (!ArcadeUserData.HasAuth) {
                 this.aicLogo.Transformations.Clear();
 
                 aicLogo.Transform(aicLogoFadeIn);
@@ -275,20 +272,31 @@ namespace osum.GameModes.MainMenu
                 AudioEngine.Music.Play();
             }
 
-            string username = GameBase.Config.GetValue<string>("username", null);
-
-            bool hasAuth = GameBase.HasAuth;
-
             firstDisplay = false;
         }
-        private void goBackToOsuLogo() {
+
+        private bool userPanelFading = false;
+
+        internal void GoBackToOsuLogo() {
+            menuBackgroundNew.ReverseAwesome();
+
             Transformation fadeOut = new TransformationF(TransformationType.Fade, 0.98f, 0f, Clock.ModeTime, Clock.ModeTime + 750);
 
             osuLogoSmall?.Transform(fadeOut);
-            userBackground?.Transform(fadeOut);
-            usernameText?.Transform(fadeOut);
-            userRankBadge?.Transform(fadeOut);
-            userStatsText?.Transform(fadeOut);
+
+            if (!this.userPanelFading) {
+                this.userPanelFading = true;
+
+                GameBase.Scheduler.Add(delegate {
+                    this.userPanelFading = false;
+                }, Clock.ModeTime + 750);
+
+
+                userBackground?.Transform(fadeOut);
+                usernameText?.Transform(fadeOut);
+                userRankBadge?.Transform(fadeOut);
+                userStatsText?.Transform(fadeOut);
+            }
 
             Transformation move = new TransformationV(Vector2.Zero, new Vector2(0, 50), Clock.ModeTime + 500, Clock.ModeTime + 1000, EasingTypes.In);
 
@@ -296,13 +304,8 @@ namespace osum.GameModes.MainMenu
             NewsButton.Transform(fadeOut);
             NewsButton.Transform(move);
 
-
-            //osuLogo.Transformations.Clear();
             osuLogo.Transform(new TransformationF(TransformationType.Scale,    osuLogo.ScaleScalar, osuLogo.ScaleScalar / 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
             osuLogo.Transform(new TransformationF(TransformationType.Rotation, 0.35f,               osuLogoOldRotation,         Clock.ModeTime, Clock.ModeTime + 1000, EasingTypes.In));
-
-            //osuLogoGloss.Transformations.Clear();
-
 
             osuLogoGloss.Transform(new TransformationF(TransformationType.Scale, osuLogoGloss.ScaleScalar, osuLogoGloss.ScaleScalar / 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
 
@@ -321,10 +324,6 @@ namespace osum.GameModes.MainMenu
             State = MenuState.Logo;
 
             osuLogo.HandleInput = true;
-
-            if (!GameBase.HasAuth) {
-                RestartAmusementIcFading();
-            }
         }
 
         private void StopAmusementIcFading() {
@@ -368,14 +367,14 @@ namespace osum.GameModes.MainMenu
 
             this.spriteManager.Add(this.userBackground);
 
-            usernameText        = new pText(GameBase.ArcadeUsername, 24.0f, new Vector2(8, baseHeight + 5), 0.9f, true, Color4.White);
+            usernameText        = new pText(ArcadeUserData.Username, 24.0f, new Vector2(8, baseHeight + 5), 0.9f, true, Color4.White);
             usernameText.Origin = OriginTypes.TopLeft;
             usernameText.Field  = FieldTypes.Standard;
             usernameText.Alpha  = 0;
 
             this.spriteManager.Add(this.usernameText);
 
-            userStatsText        = new pText($"{GameBase.ArcadeStatStreams} streams\nmiddle-class rank", 12.0f, new Vector2(10, baseHeight + 32), 0.9f, true, Color4.White);
+            userStatsText        = new pText($"{ArcadeUserData.StatStreams} streams\nmiddle-class rank", 12.0f, new Vector2(10, baseHeight + 32), 0.9f, true, Color4.White);
             userStatsText.Origin = OriginTypes.TopLeft;
             userStatsText.Field  = FieldTypes.Standard;
             userStatsText.Alpha  = 0;
@@ -393,7 +392,6 @@ namespace osum.GameModes.MainMenu
             State = MenuState.Select;
 
             osuLogo.HandleInput = false;
-            //osuLogo.Transformations.Clear();
 
             AudioEngine.PlaySample(OsuSamples.MenuHit);
 
@@ -403,7 +401,7 @@ namespace osum.GameModes.MainMenu
 
             this.osuLogoSmall?.Transform(fadeIn);
 
-            if (GameBase.HasAuth) {
+            if (ArcadeUserData.HasAuth) {
                 this.recreateUserDisplay();
                 fadeInUserDisplay();
             }
@@ -415,11 +413,9 @@ namespace osum.GameModes.MainMenu
 
             osuLogoOldRotation = this.osuLogo.Rotation;
 
-            //osuLogo.Transformations.Clear();
             osuLogo.Transform(new TransformationF(TransformationType.Scale, osuLogo.ScaleScalar, osuLogo.ScaleScalar * 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
             osuLogo.Transform(new TransformationF(TransformationType.Rotation, osuLogo.Rotation, 0.35f, Clock.ModeTime, Clock.ModeTime + 1000, EasingTypes.In));
 
-            //osuLogoGloss.Transformations.Clear();
             osuLogoGloss.FadeOut(200);
             osuLogoGloss.Transform(new TransformationF(TransformationType.Scale, osuLogoGloss.ScaleScalar, osuLogoGloss.ScaleScalar * 2.4f, Clock.ModeTime, Clock.ModeTime + 1300, EasingTypes.InDouble));
             stream.FadeOut(150);
@@ -481,16 +477,15 @@ namespace osum.GameModes.MainMenu
         private pText   userStatsText;
         private pSprite userRankBadge;
 
-        private bool _oldAuthState = GameBase.HasAuth;
+        private bool _oldAuthState = ArcadeUserData.HasAuth;
 
 
-        public override void Update()
-        {
+        public override void Update() {
             //state change!
-            if (this._oldAuthState != GameBase.HasAuth) {
-                this._oldAuthState = GameBase.HasAuth;
+            if (this._oldAuthState != ArcadeUserData.HasAuth) {
+                this._oldAuthState = ArcadeUserData.HasAuth;
 
-                if (GameBase.HasAuth) {
+                if (ArcadeUserData.HasAuth) {
                     this.recreateUserDisplay();
 
                     GameBase.Scheduler.Add(() => {
@@ -506,17 +501,28 @@ namespace osum.GameModes.MainMenu
                     }, 1500);
 
                     this.StopAmusementIcFading();
-                } else {
+
+                }
+                //If auth state changed, and we're no longer logged in, and the panel isn't already fading. fade it out.
+                else if(!userPanelFading) {
+                    userPanelFading = true;
+
                     Transformation fadeOut = new TransformationF(TransformationType.Fade, 0.98f, 0.0f, Clock.ModeTime + 1300, Clock.ModeTime + 1700);
 
-                    userBackground.Transform(fadeOut);
-                    userRankBadge.Transform(fadeOut);
-                    userStatsText.Transform(fadeOut);
-                    usernameText.Transform(fadeOut);
+                    GameBase.Scheduler.Add(delegate {
+                        userPanelFading = false;
+                    }, Clock.ModeTime + 1700);
+
+                    userBackground?.Transform(fadeOut);
+                    userRankBadge?.Transform(fadeOut);
+                    userStatsText?.Transform(fadeOut);
+                    usernameText?.Transform(fadeOut);
 
                     this.RestartAmusementIcFading();
                 }
             }
+
+            ArcadeUserData.CreditOverReturnCatch();
 
             osuLogoGloss.Rotation = -menuBackgroundNew.Rotation;
 
@@ -541,7 +547,6 @@ namespace osum.GameModes.MainMenu
                 else
                     menuBackgroundNew.ScaleScalar += sCh;
             }
-
 
             updateBeat();
 
@@ -592,7 +597,7 @@ namespace osum.GameModes.MainMenu
             explosion.ScaleScalar *= 1 + (0.2f * strength);
             explosion.ScaleTo(sizeForExplosion(beat), 400, EasingTypes.In);
 
-            osuLogoSmall.ScaleScalar *= 1 + (0.05f * strength);
+            osuLogoSmall.ScaleScalar *= 1 + (0.025f * strength);
             osuLogoSmall.ScaleTo(1.0f, 400, EasingTypes.In);
         }
 

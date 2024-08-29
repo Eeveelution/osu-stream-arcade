@@ -13,6 +13,7 @@ using osum.Helpers;
 using osum.Input;
 using osum.Input.Sources;
 using osum.Localisation;
+using osum.UI;
 
 namespace osum.GameModes.SongSelect
 {
@@ -140,7 +141,20 @@ namespace osum.GameModes.SongSelect
                     break;
                 case SelectState.DifficultySelect:
                 case SelectState.LoadingPreview:
-                    leaveDifficultySelection(sender, args);
+                    if (ArcadeUserData.CreditOver()) {
+                        GameBase.Notify(new Notification(
+                            "Time's over!",
+                            "Your timer has expired! You can either play this map, or quit. Do you want to quit?", NotificationStyle.YesNo,
+                            b => {
+                                if (b) {
+                                    ArcadeUserData.CreditOverReturnCatch(() => {
+                                        leaveDifficultySelection(sender, args);
+                                    });
+                                }
+                            }));
+                    } else {
+                        leaveDifficultySelection(sender, args);
+                    }
                     break;
                 case SelectState.SongInfo:
                     SongInfo_Hide();
@@ -148,6 +162,7 @@ namespace osum.GameModes.SongSelect
                 case SelectState.RankingDisplay:
                     Ranking_Hide();
                     showDifficultySelection2();
+
                     break;
             }
         }
@@ -382,6 +397,8 @@ namespace osum.GameModes.SongSelect
 
         private const int time_to_hover = 400;
 
+        private bool kickedIntoMapByCreditRunningOut = false;
+
         public override void Update()
         {
             base.Update();
@@ -457,6 +474,16 @@ namespace osum.GameModes.SongSelect
 
                     float newIntOffset = isBound ? (int)Math.Round(songSelectOffset / panelHeightPadded) : songSelectOffset / panelHeightPadded;
 
+                    if (ArcadeUserData.CreditOver() && !kickedIntoMapByCreditRunningOut) {
+                        kickedIntoMapByCreditRunningOut = true;
+
+                        int index = (int)(-newIntOffset) + 2;
+
+                        this.SelectedPanel = panels[index];
+
+                        this.showDifficultySelection(panels[index], false, true);
+                    }
+
                     if (Director.PendingOsuMode == OsuMode.Unknown)
                     {
                         if (InputManager.PrimaryTrackingPoint != null && InputManager.IsPressed)
@@ -514,7 +541,10 @@ namespace osum.GameModes.SongSelect
                         }
                         else
                         {
-                            cancelHoverPreview();
+                            if (!this.kickedIntoMapByCreditRunningOut) {
+                                cancelHoverPreview();
+                            }
+
                             if (!AudioEngine.Music.IsElapsing)
                                 InitializeBgm();
                         }

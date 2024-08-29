@@ -129,7 +129,13 @@ namespace osum
         private readonly OsuMode startupMode;
 
         private SerialPort _cardReaderPort;
+#if DEBUG
+        public static double LastFrameTime, LastUpdateTime;
 
+        private pText updateTimeText, drawTimeText;
+#endif
+
+        private pText creditTimeText;
         public GameBase(OsuMode mode = OsuMode.Unknown)
         {
             startupMode = mode;
@@ -152,6 +158,8 @@ namespace osum
             Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
 
             Clock.USER_OFFSET = Config.GetValue("offset", 0);
+
+
         }
 
         private BinaryReader _cardReaderBinaryReader;
@@ -411,6 +419,17 @@ namespace osum
 #endif
 
             Clock.Start();
+#if DEBUG
+            this.drawTimeText = new pText("frame: 0.0ms (0fps)", 10, new Vector2(0, 0), 1.0f, true, Color4.White);
+            this.updateTimeText = new pText("update: 0.0ms (0ups)", 10, new Vector2(0, 12), 1.0f, true, Color4.White);
+
+            MainSpriteManager.Add(this.drawTimeText);
+            //MainSpriteManager.Add(this.updateTimeText);
+#endif
+
+            creditTimeText = new pText("", 12, new Vector2(0, 12), 1.0f, true, Color4.White);
+
+            MainSpriteManager.Add(this.creditTimeText);
         }
 
         public virtual string DeviceIdentifier => "1234567890123456789012345678901234567890";
@@ -470,25 +489,26 @@ namespace osum
                 return;
             }
 
-            bool parsedUserId = ulong.TryParse(splitDataString[0], out ArcadeUserId);
+            bool parsedUserId = ulong.TryParse(splitDataString[0], out ArcadeUserData.UserId);
 
             if (!parsedUserId) {
                 this.loginFailed();
                 return;
             }
 
-            bool parsedStreams = double.TryParse(splitDataString[2], NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out ArcadeStatStreams);
+            bool parsedStreams = double.TryParse(splitDataString[2], NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out ArcadeUserData.StatStreams);
 
             if (!parsedStreams) {
                 this.loginFailed();
                 return;
             }
 
-            ArcadeUsername = splitDataString[1];
+            ArcadeUserData.Username = splitDataString[1];
 
             Notify(new Notification("Welcome!", "Authentication successful!", NotificationStyle.Brief));
 
-            HasAuth = true;
+            ArcadeUserData.HasAuth = true;
+            ArcadeUserData.IsGuest = false;
         }
 
         private void loginFailed() {
@@ -588,8 +608,9 @@ namespace osum
                                         );
 
                                         Notify(this._cardLoadingNotification);
-                                    }
-                                    break;
+                                     }
+
+                                     break;
                                 case "CardData":
                                     if (splitCommand.Length >= 3) {
                                         string cardType = splitCommand[2];
@@ -693,6 +714,12 @@ namespace osum
 
             ActiveNotification?.Update();
 
+            string newCreditTime = ArcadeUserData.GetFormattedRemainingTime();
+
+            if (creditTimeText.Text != newCreditTime) {
+                creditTimeText.Text = newCreditTime;
+            }
+
             return true;
         }
         private void LoginExistingCard(string cardId, string userDataLine) {
@@ -726,7 +753,7 @@ namespace osum
                         return;
                     }
 
-                    ArcadeToken = result;
+                    ArcadeUserData.Token = result;
 
                     EstablishUser(userDataLine);
                 };
@@ -749,6 +776,9 @@ namespace osum
                 GL.Clear(Constants.COLOR_DEPTH_BUFFER_BIT);
 
             Director.Draw();
+
+            drawTimeText.Text   = $"frame: {LastFrameTime}ms ({Math.Round(1000.0f / LastFrameTime, 2)}fps)";
+            //updateTimeText.Text = $"update: {LastUpdateTime}ms ({Math.Round(1000.0f / LastUpdateTime, 2)}fps)";
 
             MainSpriteManager.Draw();
         }
@@ -836,13 +866,6 @@ namespace osum
         public static bool Mapper;
 
         internal static int SuperWidePadding => IsSuperWide ? 30 : 0;
-
-        public static bool   HasAuth           = false;
-        public static string ArcadeToken       = "";
-        public static string ArcadeUsername    = "";
-        public static ulong  ArcadeUserId      = 0;
-        public static double ArcadeStatStreams = 0.0;
-
 
         internal static void Notify(string simple, BoolDelegate action = null)
         {

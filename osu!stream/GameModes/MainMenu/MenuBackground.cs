@@ -8,6 +8,7 @@ using osum.Graphics;
 using osum.Graphics.Primitives;
 using osum.Graphics.Sprites;
 using osum.Helpers;
+using osum.UI;
 
 namespace osum.GameModes.MainMenu
 {
@@ -246,8 +247,21 @@ namespace osum.GameModes.MainMenu
 
             if (sender == yellow)
                 Director.ChangeMode(OsuMode.Tutorial);
-            else if (sender == orange)
+            else if (sender == orange) {
                 Director.ChangeMode(OsuMode.SongSelect);
+
+                if (!ArcadeUserData.CreditStarted()) {
+                    if (ArcadeUserData.IsGuest) {
+                        GameBase.Notify(new Notification(
+                            "Credit Started",
+                            "Playing as Guest!\n\nCredit Timer started!",
+                            NotificationStyle.Brief
+                        ));
+                    }
+
+                    ArcadeUserData.StartCredit();
+                }
+            }
             else if (sender == blue)
                 Director.ChangeMode(OsuMode.Store);
             else if (sender == pink)

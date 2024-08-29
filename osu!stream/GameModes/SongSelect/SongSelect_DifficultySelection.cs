@@ -42,11 +42,11 @@ namespace osum.GameModes.SongSelect
             }
         }
 
-        private void showDifficultySelection(BeatmapPanel panel, bool instant = false)
+        private void showDifficultySelection(BeatmapPanel panel, bool instant = false, bool forcedClick = false)
         {
             if (!instant && State != SelectState.SongSelect && State != SelectState.SongInfo) return;
 
-            if (Clock.ModeTime - lastDownTime > time_to_hover) return;
+            if ((Clock.ModeTime - lastDownTime > time_to_hover) && !forcedClick) return;
 
             cancelHoverPreview();
             cancelLockedHoverPreview();
@@ -509,7 +509,13 @@ namespace osum.GameModes.SongSelect
 
             s_Footer.AdditiveFlash(500, 0.5f);
 
-            GameBase.Scheduler.Add(delegate { Director.ChangeMode(OsuMode.Play); }, 800);
+            GameBase.Scheduler.Add(delegate {
+                Director.ChangeMode(OsuMode.Play);
+
+                GameBase.Scheduler.Add(delegate {
+                    leaveDifficultySelection(sender, args);
+                }, 500);
+            }, 800);
         }
     }
 }

@@ -15,6 +15,7 @@ using osum.Input;
 using osum.Input.Sources;
 using osum.Libraries.NetLib;
 using osum.Localisation;
+using osum.Support.Desktop;
 using osum.UI;
 
 #if iOS
@@ -682,6 +683,12 @@ namespace osum.GameModes.Results
 
         private void returnToSelect(object sender, EventArgs args)
         {
+            if (ArcadeUserData.CreditOver()) {
+                ArcadeUserData.CreditOverReturnCatch();
+
+                return;
+            }
+
             Director.ChangeMode(OsuMode.SongSelect);
         }
 
