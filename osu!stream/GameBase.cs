@@ -41,6 +41,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using OpenTK;
@@ -135,7 +136,7 @@ namespace osum
         private pText updateTimeText, drawTimeText;
 #endif
 
-        private pText creditTimeText;
+        private pSpriteText creditTimeText;
         public GameBase(OsuMode mode = OsuMode.Unknown)
         {
             startupMode = mode;
@@ -146,23 +147,27 @@ namespace osum
             //initialise config before everything, because it may be used in Initialize() override.
             Config = new pConfigManager(Instance.PathConfig + "osum.cfg");
 
-            this._cardReaderPort              =  new SerialPort(Config.GetValue("CardReaderPort", "COM5"), 115200);
-            this._cardReaderPort.Handshake    =  Handshake.None;
-            this._cardReaderPort.ReadTimeout  =  500;
-            this._cardReaderPort.RtsEnable    =  true;
-            this._cardReaderPort.DtrEnable    =  true;
-            this._cardReaderPort.Open();
+            string setSerialPort = Config.GetValue("CardReaderPort", "COM5");
 
-            _cardReaderBinaryReader = new BinaryReader(this._cardReaderPort.BaseStream);
+            if (SerialPort.GetPortNames().Contains(setSerialPort)) {
+                this._cardReaderPort             = new SerialPort(setSerialPort, 115200);
+                this._cardReaderPort.Handshake   = Handshake.None;
+                this._cardReaderPort.ReadTimeout = 500;
+                this._cardReaderPort.RtsEnable   = true;
+                this._cardReaderPort.DtrEnable   = true;
+                this._cardReaderPort.Open();
 
-            Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
+                Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
+            } else {
+                
+            }
+
 
             Clock.USER_OFFSET = Config.GetValue("offset", 0);
 
 
         }
 
-        private BinaryReader _cardReaderBinaryReader;
         private List<char>   _cardReaderBuffer = new List<char>();
 
         internal static Vector2 BaseSizeHalf => new Vector2(BaseSizeFixedWidth.X / 2, BaseSizeFixedWidth.Y / 2);
@@ -427,8 +432,7 @@ namespace osum
             //MainSpriteManager.Add(this.updateTimeText);
 #endif
 
-            creditTimeText = new pText("", 12, new Vector2(0, 12), 1.0f, true, Color4.White);
-
+            creditTimeText = new pSpriteText("00.00", "default", -2, FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(0, 12), 0.9f, true, Color4.White);
             MainSpriteManager.Add(this.creditTimeText);
         }
 
@@ -722,6 +726,7 @@ namespace osum
 
             return true;
         }
+
         private void LoginExistingCard(string cardId, string userDataLine) {
             _cardLoadingNotification.Dismiss(true);
 

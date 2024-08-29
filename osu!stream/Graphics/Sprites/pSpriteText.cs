@@ -40,8 +40,8 @@ namespace osum.Graphics.Sprites
 {
     internal class pSpriteText : pSprite
     {
-        internal List<int> renderCoordinates = new List<int>();
-        internal List<pTexture> renderTextures = new List<pTexture>();
+        internal List<Vector2>  renderCoordinates = new List<Vector2>();
+        internal List<pTexture> renderTextures    = new List<pTexture>();
 
         internal bool TextConstantSpacing = false;
         internal string TextFont = "default";
@@ -81,10 +81,8 @@ namespace osum.Graphics.Sprites
             textChanged = true;
         }
 
-        internal string Text
-        {
-            set
-            {
+        internal string Text {
+            set {
                 bool sameSizeArray = textArray != null && value.Length == textArray.Length;
 
                 if (value?.Length > MAX_LENGTH)
@@ -92,22 +90,17 @@ namespace osum.Graphics.Sprites
 
                 bool sameString = sameSizeArray;
 
-                if (sameSizeArray)
-                {
-                    for (int i = 0; i < textArray.Length; i++)
-                    {
-                        if (value[i] != textArray[i])
-                        {
-                            sameString = false;
+                if (sameSizeArray) {
+                    for (int i = 0; i < textArray.Length; i++) {
+                        if (value[i] != textArray[i]) {
+                            sameString   = false;
                             textArray[i] = value[i];
                         }
                     }
 
                     if (sameString)
-                        return; //strings are equal
-                }
-                else
-                {
+                        return;//strings are equal
+                } else {
                     if (value == null)
                         textArray = null;
                     else
@@ -116,6 +109,9 @@ namespace osum.Graphics.Sprites
 
                 textChanged = true;
             }
+            get {
+                return new string(this.textArray);
+            }
         }
 
         private bool textChanged;
@@ -123,6 +119,8 @@ namespace osum.Graphics.Sprites
         private readonly OsuTexture osuTextureFont;
 
         private const int MAX_LENGTH = 9; // 100.00% (7) 1,000,000 (9)
+
+        private pTexture fallback;
 
         internal pSpriteText(string text, string fontname, int spacingOverlap, FieldTypes fieldType, OriginTypes originType, ClockTypes clockType,
             Vector2 startPosition, float drawDepth, bool alwaysDraw, Color4 colour)
@@ -134,7 +132,8 @@ namespace osum.Graphics.Sprites
             {
                 osuTextureFont = (OsuTexture)Enum.Parse(typeof(OsuTexture), TextFont + "_0");
 
-                Texture = TextureManager.Load(osuTextureFont);
+                Texture       = TextureManager.Load(osuTextureFont);
+                this.fallback = TextureManager.Load("score_0");
                 //preload
             }
             catch
@@ -272,6 +271,10 @@ namespace osum.Graphics.Sprites
                 else
                     tex = TextureManager.Load(TextFont + "-" + c);
 
+                if (tex == null) {
+                    tex = TextureManager.Load(OsuTexture.score_dot);
+                }
+
                 textureCache[c] = tex;
             }
 
@@ -292,8 +295,8 @@ namespace osum.Graphics.Sprites
             if (textArray == null)
                 return;
 
-            int currentX = 0;
-            int height = 0;
+            float currentX = 0;
+            float height = 0;
 
             for (int i = 0; i < textArray.Length; i++)
             {
@@ -301,11 +304,13 @@ namespace osum.Graphics.Sprites
 
                 currentX -= (TextConstantSpacing || i == 0 ? 0 : SpacingOverlap);
 
-                int x = currentX;
+                float x = currentX;
 
                 pTexture tex = textureFor(c);
 
-                if (tex == null) continue;
+                if (tex == null) {
+                    continue;
+                }
 
                 if (!TextConstantSpacing || c < '0' || c > '9')
                     currentX += tex.Width;
@@ -313,9 +318,12 @@ namespace osum.Graphics.Sprites
                 renderTextures.Add(tex);
 
                 if (TextConstantSpacing)
-                    renderCoordinates.Add(currentX - x);
+                    renderCoordinates.Add(new Vector2(currentX - x, 0));
+                else if (c == '.') {
+                    this.renderCoordinates.Add(new Vector2(x, -10));
+                }
                 else
-                    renderCoordinates.Add(x);
+                    renderCoordinates.Add(new Vector2(x, 0));
 
                 if (height == 0)
                     height = tex.Height;
@@ -332,25 +340,25 @@ namespace osum.Graphics.Sprites
 
                 for (int i = 0; i < renderCoordinates.Count; i++)
                 {
-                    int x = renderCoordinates[i];
+                    Vector2 pos = renderCoordinates[i];
 
-                    if (x == 0)
+                    if (pos.X == 0)
                     {
-                        x = currentX + Math.Max(0, (charWidth - renderTextures[i].Width) / 2);
+                        pos.X = currentX + Math.Max(0, (charWidth - renderTextures[i].Width) / 2);
                         currentX += charWidth - SpacingOverlap;
                     }
                     else
                     {
-                        int oldX = x;
-                        x = currentX;
+                        float oldX = pos.X;
+                        pos.X = currentX;
                         currentX += oldX - SpacingOverlap;
                     }
 
                     if (!exactCoordinatesOverride)
-                        if (x % 2 != 0)
-                            x++;
+                        if (pos.X % 2 != 0)
+                            pos.X++;
 
-                    renderCoordinates[i] = x;
+                    renderCoordinates[i] = new Vector2(pos.X, 0);
                 }
             }
 
@@ -419,7 +427,7 @@ namespace osum.Graphics.Sprites
 
                     foreach (pTexture tex in renderTextures)
                     {
-                        Vector2 thisDrawPos = new Vector2(drawPos.X + renderCoordinates[i] * coordScale, drawPos.Y);
+                        Vector2 thisDrawPos = new Vector2(drawPos.X + renderCoordinates[i].X * coordScale, drawPos.Y + this.renderCoordinates[i].Y);
 
                         unsafe
                         {

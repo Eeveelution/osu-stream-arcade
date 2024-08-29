@@ -49,6 +49,7 @@ namespace osum.Graphics.Sprites
 
         protected pTexture texture;
 
+
         internal pSprite(pTexture texture, FieldTypes field, OriginTypes origin, ClockTypes clocking, Vector2 position,
             float depth, bool alwaysDraw, Color4 colour)
         {

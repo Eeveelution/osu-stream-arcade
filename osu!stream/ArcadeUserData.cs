@@ -23,15 +23,20 @@ namespace osum {
         public static string GetFormattedRemainingTime() {
             long remainingSeconds = (long)( (double)(CreditLength - CreditCounter.ElapsedMilliseconds) / 1000.0f);
 
-            double minutes = Math.Floor((double) remainingSeconds / 60.0f);
+            double minutes = Math.Max(Math.Floor((double) remainingSeconds / 60.0f), 0);
 
             remainingSeconds -= (long) (minutes * 60.0f);
 
-            return $"{(int) minutes}:{remainingSeconds}";
+            return $"{(int) minutes}.{(int)Math.Max(remainingSeconds, 0):00}";
         }
 
         public static void StartCredit() {
             CreditCounter.Start();
+
+            if (IsGuest) {
+                HasAuth  = true;
+                Username = "Guest";
+            }
         }
 
         public static bool CreditStarted() {

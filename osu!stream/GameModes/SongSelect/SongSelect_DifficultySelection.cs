@@ -422,7 +422,7 @@ namespace osum.GameModes.SongSelect
             }
         }
 
-        private void leaveDifficultySelection(object sender, EventArgs args)
+        private void leaveDifficultySelection(object sender, EventArgs args, bool dontResetMusic = false)
         {
             Player.Beatmap = null;
             bmi = null;
@@ -432,7 +432,9 @@ namespace osum.GameModes.SongSelect
 
             State = SelectState.SongSelect;
 
-            InitializeBgm();
+            if (!dontResetMusic) {
+                InitializeBgm();
+            }
 
             GameBase.Scheduler.Add(delegate
             {
@@ -513,8 +515,8 @@ namespace osum.GameModes.SongSelect
                 Director.ChangeMode(OsuMode.Play);
 
                 GameBase.Scheduler.Add(delegate {
-                    leaveDifficultySelection(sender, args);
-                }, 500);
+                    leaveDifficultySelection(sender, args, true);
+                }, 1000);
             }, 800);
         }
     }
