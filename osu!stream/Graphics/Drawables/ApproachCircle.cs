@@ -56,7 +56,8 @@ namespace osum.Graphics.Drawables
             Position = position;
             Radius = radius;
             Colour = colour;
-            parts = GameBase.IsSlowDevice ? 36 : 48;
+            //parts = GameBase.IsSlowDevice ? 36 : 48;
+            parts = 128;
 
 
 #if !NO_PIN_SUPPORT

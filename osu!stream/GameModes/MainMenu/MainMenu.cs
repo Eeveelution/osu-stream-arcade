@@ -201,7 +201,7 @@ namespace osum.GameModes.MainMenu
                 spriteManager.Add(headphones);
 
 #if !DIST
-                headphones.OnClick += delegate
+                /*headphones.OnClick += delegate
                 {
                     GameBase.Mapper = true;
                     pText t = new pText("ENABLED MAPPER MODE", 24, new Vector2(0, 30), 1, false, Color4.Red)
@@ -211,7 +211,7 @@ namespace osum.GameModes.MainMenu
                     };
                     t.FadeOutFromOne(1500);
                     spriteManager.Add(t);
-                };
+                };*/
 #endif
 
                 pDrawable add = headphones.Clone();

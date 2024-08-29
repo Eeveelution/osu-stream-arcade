@@ -212,14 +212,14 @@ namespace osum.Support.Desktop
             base.OnRenderFrame(e);
 
             if (GameBase.Instance != null) GameBase.Instance.Draw();
-
-            // display
-            SwapBuffers();
 #if DEBUG
             frameTime.Stop();
 
             GameBase.LastFrameTime = ((double)frameTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
 #endif
+            // display
+            SwapBuffers();
+
         }
     }
 }

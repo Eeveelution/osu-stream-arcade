@@ -424,9 +424,6 @@ namespace osum.GameModes.SongSelect
 
         private void leaveDifficultySelection(object sender, EventArgs args, bool dontResetMusic = false)
         {
-            Player.Beatmap = null;
-            bmi = null;
-
             touchingBegun = false;
             velocity = 0;
 
@@ -434,6 +431,8 @@ namespace osum.GameModes.SongSelect
 
             if (!dontResetMusic) {
                 InitializeBgm();
+                Player.Beatmap = null;
+                bmi            = null;
             }
 
             GameBase.Scheduler.Add(delegate
