@@ -58,7 +58,6 @@ using osum.Localisation;
 using osum.Support;
 using osum.UI;
 
-
 namespace osum
 {
     public abstract class GameBase
@@ -129,7 +128,8 @@ namespace osum
 
         private readonly OsuMode startupMode;
 
-        private SerialPort _cardReaderPort;
+        private SerialPort   _cardReaderPort;
+        private BinaryReader _cardReaderBinaryReader;
 #if DEBUG
         public static double LastFrameTime, LastUpdateTime;
 
@@ -147,25 +147,7 @@ namespace osum
             //initialise config before everything, because it may be used in Initialize() override.
             Config = new pConfigManager(Instance.PathConfig + "osum.cfg");
 
-            string setSerialPort = Config.GetValue("CardReaderPort", "COM5");
-
-            if (SerialPort.GetPortNames().Contains(setSerialPort)) {
-                this._cardReaderPort             = new SerialPort(setSerialPort, 115200);
-                this._cardReaderPort.Handshake   = Handshake.None;
-                this._cardReaderPort.ReadTimeout = 500;
-                this._cardReaderPort.RtsEnable   = true;
-                this._cardReaderPort.DtrEnable   = true;
-                this._cardReaderPort.Open();
-
-                Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
-            } else {
-                
-            }
-
-
             Clock.USER_OFFSET = Config.GetValue("offset", 0);
-
-
         }
 
         private List<char>   _cardReaderBuffer = new List<char>();
@@ -434,6 +416,21 @@ namespace osum
 
             creditTimeText = new pSpriteText("00.00", "default", -2, FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(0, 12), 0.9f, true, Color4.White);
             MainSpriteManager.Add(this.creditTimeText);
+
+            string setSerialPort = Config.GetValue("CardReaderPort", "COM5");
+
+            if (SerialPort.GetPortNames().Contains(setSerialPort)) {
+                this._cardReaderPort             = new SerialPort(setSerialPort, 115200);
+                this._cardReaderPort.Handshake   = Handshake.None;
+                this._cardReaderPort.ReadTimeout = 500;
+                this._cardReaderPort.RtsEnable   = true;
+                this._cardReaderPort.DtrEnable   = true;
+                this._cardReaderPort.Open();
+
+                _cardReaderBinaryReader = new BinaryReader(this._cardReaderPort.BaseStream);
+
+                Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
+            }
         }
 
         public virtual string DeviceIdentifier => "1234567890123456789012345678901234567890";
@@ -588,107 +585,109 @@ namespace osum
         /// <returns>true if a draw should occur</returns>
         public bool Update()
         {
-            while (this._cardReaderPort.BytesToRead > 0) {
-                try {
-                    char newData = _cardReaderBinaryReader.ReadChar();
+            if (this._cardReaderPort != null) {
+                while (this._cardReaderPort.BytesToRead > 0) {
+                    try {
+                        char newData = _cardReaderBinaryReader.ReadChar();
 
-                    if (newData == '\n') {
-                        string finishedLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
+                        if (newData == '\n') {
+                            string finishedLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
 
-                        Console.WriteLine("AIC IO: " + finishedLine);
+                            Console.WriteLine("AIC IO: " + finishedLine);
 
-                        string[] splitCommand = finishedLine.Split('|');
+                            string[] splitCommand = finishedLine.Split('|');
 
-                        if (splitCommand.Length >= 1) {
-                            switch (splitCommand[0]) {
-                                case "CardSignal":
-                                     if (!this._cardLoadingSpinnerActive) {
-                                        _cardLoadingSpinnerActive = true;
+                            if (splitCommand.Length >= 1) {
+                                switch (splitCommand[0]) {
+                                    case "CardSignal":
+                                         if (!this._cardLoadingSpinnerActive) {
+                                            _cardLoadingSpinnerActive = true;
 
-                                        _cardLoadingNotification = new Notification(
-                                            "Logging into the osu!arcade network!",
-                                            "Attempting to retrieve information about card.",
-                                            NotificationStyle.Loading
-                                        );
+                                            _cardLoadingNotification = new Notification(
+                                                "Logging into the osu!arcade network!",
+                                                "Attempting to retrieve information about card.",
+                                                NotificationStyle.Loading
+                                            );
 
-                                        Notify(this._cardLoadingNotification);
-                                     }
+                                            Notify(this._cardLoadingNotification);
+                                         }
 
-                                     break;
-                                case "CardData":
-                                    if (splitCommand.Length >= 3) {
-                                        string cardType = splitCommand[2];
-                                        string cardId = splitCommand[3];
+                                         break;
+                                    case "CardData":
+                                        if (splitCommand.Length >= 3) {
+                                            string cardType = splitCommand[2];
+                                            string cardId = splitCommand[3];
 
-                                        string censoredCardId = cardId.Substring(0, 3);
+                                            string censoredCardId = cardId.Substring(0, 3);
 
-                                        for (int i = 0; i != (cardId.Length - 6); i++) {
-                                            censoredCardId += 'x';
-                                        }
+                                            for (int i = 0; i != (cardId.Length - 6); i++) {
+                                                censoredCardId += 'x';
+                                            }
 
-                                        censoredCardId += cardId.Substring(cardId.Length - 6, 3);
+                                            censoredCardId += cardId.Substring(cardId.Length - 6, 3);
 
-                                        Scheduler.Add(() => {
-                                            this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardType + " Card with ID:\n" + censoredCardId;
+                                            Scheduler.Add(() => {
+                                                this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardType + " Card with ID:\n" + censoredCardId;
 
-                                            StringNetRequest arcadeAuth = new StringNetRequest("http://localhost:80/stream/arcade-auth", "POST", cardId);
+                                                StringNetRequest arcadeAuth = new StringNetRequest("http://localhost:80/stream/arcade-auth", "POST", cardId);
 
-                                            arcadeAuth.onFinish += (result, exception) => {
-                                                if (exception != null || result == "") {
-                                                    loginFailed();
-                                                    return;
-                                                }
-
-                                                string[] splitResult = result.Split('\n');
-
-                                                switch (splitResult.Length) {
-                                                    //Card is new
-                                                    case 1:
-                                                        this.RegisterNewCard(cardId);
-                                                        break;
-                                                    //Card exists
-                                                    case 2:
-                                                        this.LoginExistingCard(cardId, splitResult[1]);
-                                                        break;
-                                                    default:
+                                                arcadeAuth.onFinish += (result, exception) => {
+                                                    if (exception != null || result == "") {
                                                         loginFailed();
-                                                        break;
-                                                }
-                                            };
+                                                        return;
+                                                    }
 
-                                            NetManager.AddRequest(arcadeAuth);
-                                        }, 1000);
-                                    } else {
-                                        loginFailed();
-                                    }
-                                    break;
+                                                    string[] splitResult = result.Split('\n');
+
+                                                    switch (splitResult.Length) {
+                                                        //Card is new
+                                                        case 1:
+                                                            this.RegisterNewCard(cardId);
+                                                            break;
+                                                        //Card exists
+                                                        case 2:
+                                                            this.LoginExistingCard(cardId, splitResult[1]);
+                                                            break;
+                                                        default:
+                                                            loginFailed();
+                                                            break;
+                                                    }
+                                                };
+
+                                                NetManager.AddRequest(arcadeAuth);
+                                            }, 1000);
+                                        } else {
+                                            loginFailed();
+                                        }
+                                        break;
+                                }
                             }
+
+                            this._cardReaderBuffer.Clear();
+                        } else {
+                            this._cardReaderBuffer.Add(newData);
+                        }
+                    }
+                    catch {
+                        string existingLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
+                        Console.WriteLine("Line before read err: " + existingLine);
+
+                        this._cardLoadingNotification?.Dismiss(false);
+
+                        if (_cardReadErrNotification == null || _cardReadErrNotification.Dismissed) {
+                            this._cardReadErrNotification = new Notification(
+                                "Failed to read card!",
+                                "The Data on your card could not be successfully read. Make sure your card is not damaged in any way that could hinder the reader from receiving correct data!",
+                                NotificationStyle.Okay
+                            );
+
+                            Scheduler.Add(() => {
+                                Notify(this._cardReadErrNotification);
+                            }, 500);
                         }
 
                         this._cardReaderBuffer.Clear();
-                    } else {
-                        this._cardReaderBuffer.Add(newData);
                     }
-                }
-                catch {
-                    string existingLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
-                    Console.WriteLine("Line before read err: " + existingLine);
-
-                    this._cardLoadingNotification?.Dismiss(false);
-
-                    if (_cardReadErrNotification == null || _cardReadErrNotification.Dismissed) {
-                        this._cardReadErrNotification = new Notification(
-                            "Failed to read card!",
-                            "The Data on your card could not be successfully read. Make sure your card is not damaged in any way that could hinder the reader from receiving correct data!",
-                            NotificationStyle.Okay
-                        );
-
-                        Scheduler.Add(() => {
-                            Notify(this._cardReadErrNotification);
-                        }, 500);
-                    }
-
-                    this._cardReaderBuffer.Clear();
                 }
             }
 

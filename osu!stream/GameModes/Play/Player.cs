@@ -847,7 +847,9 @@ namespace osum.GameModes.Play
                 {
                     if (Autoplay)
                     {
-                        Director.ChangeMode(OsuMode.SongSelect, new FadeTransition(3000, FadeTransition.DEFAULT_FADE_IN));
+                        if (!ArcadeUserData.CreditOverReturnCatch()) {
+                            Director.ChangeMode(OsuMode.SongSelect, new FadeTransition(3000, FadeTransition.DEFAULT_FADE_IN));
+                        }
                     }
                     else
                     {

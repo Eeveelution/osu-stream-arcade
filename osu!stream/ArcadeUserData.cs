@@ -66,10 +66,10 @@ namespace osum {
                 string text = "Your timer has run out! Please look around and let others try out the arcade too!";
 
                 if (!IsGuest) {
-                    text += "\n\nPlease remember to take your Amusement IC card with you!";
+                    text += "\nPlease remember to take your Amusement IC card with you!";
                 }
 
-                GameBase.Notify(_thanksForPlayingNotification = new Notification("Thanks for playing!", text, NotificationStyle.Okay, b => {
+                _thanksForPlayingNotification = new Notification("Thanks for playing!", text, NotificationStyle.Okay, b => {
                     ResetLogin();
 
                     if (Director.CurrentOsuMode != OsuMode.MainMenu) {
@@ -88,7 +88,11 @@ namespace osum {
                             }
                         }, 500);
                     }
-                }));
+                });
+
+                _thanksForPlayingNotification.descriptionText.TextSize = 20;
+
+                GameBase.Notify(_thanksForPlayingNotification);
 
                 return true;
             }

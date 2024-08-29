@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using osum.Audio;
 using osum.Graphics;
 
@@ -42,8 +44,13 @@ namespace osum
             GameBase.Instance = new GameBaseAndroid(activity);
             GameBase.Instance.Run();
 #else
-            GameBase game = new GameBaseDesktop();
-            game.Run();
+            try {
+                GameBase game = new GameBaseDesktop();
+                game.Run();
+            }
+            catch (Exception e) {
+                File.WriteAllText("kurwa.txt", e.ToString());
+            }
 #endif
         }
 
