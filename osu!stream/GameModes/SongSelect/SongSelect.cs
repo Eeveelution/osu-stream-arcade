@@ -477,7 +477,7 @@ namespace osum.GameModes.SongSelect
                     if (ArcadeUserData.CreditOver() && !kickedIntoMapByCreditRunningOut) {
                         kickedIntoMapByCreditRunningOut = true;
 
-                        int index = (int)(-newIntOffset) + 2;
+                        int index = Math.Min((int)(-newIntOffset) + 2, panels.Count - 1);
 
                         this.SelectedPanel = panels[index];
 

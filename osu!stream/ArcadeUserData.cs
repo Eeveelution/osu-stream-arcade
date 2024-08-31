@@ -90,7 +90,7 @@ namespace osum {
                     }
                 });
 
-                _thanksForPlayingNotification.descriptionText.TextSize = 20;
+                _thanksForPlayingNotification.descriptionText.TextSize = 22;
 
                 GameBase.Notify(_thanksForPlayingNotification);
 

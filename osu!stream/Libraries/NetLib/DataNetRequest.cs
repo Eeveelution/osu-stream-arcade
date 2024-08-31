@@ -167,7 +167,8 @@ namespace osum.Libraries.NetLib
                     }
 
                     var response = hc.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).Result;
-                    response.EnsureSuccessStatusCode();
+
+
 
                     // If server returns Content-Length, support download progress reporting.
                     if(response.Content.Headers.ContentLength != null)
@@ -198,6 +199,8 @@ namespace osum.Libraries.NetLib
                     {
                         data = response.Content.ReadAsByteArrayAsync().Result;
                     }
+
+                    response.EnsureSuccessStatusCode();
                 }
 
                 processFinishedRequest();

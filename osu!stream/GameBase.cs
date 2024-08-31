@@ -60,11 +60,12 @@ using osum.UI;
 
 namespace osum
 {
-    public abstract class GameBase
+    public abstract partial class GameBase
     {
         public static GameBase Instance;
 
-        public static Random Random = new Random();
+        public static pTexture WhitePixel;
+        public static Random   Random = new Random();
 
         /// <summary>
         /// use for input handling, sprites etc.
@@ -359,6 +360,9 @@ namespace osum
 
             AudioEngine.Initialize(effect, music);
 
+            WhitePixel = pTexture.FromRawBytes(new byte[]{255, 255, 255, 255}, 1, 1);
+
+
 #if !RELEASE
             DebugOverlay.Update();
 #endif
@@ -467,25 +471,21 @@ namespace osum
             return new NativeAssetManager();
         }
 
-        private bool         _cardLoadingSpinnerActive = false;
-        private Notification _cardLoadingNotification;
-        private Notification _linkCodeEntryNotification;
-        private Notification _pinEntryNotification;
-        private Notification _cardReadErrNotification;
+
 
         //Sets up all variables after the user is logged in
         //also creates the display on the main menu that the user is logged in
         //with all sorts of stats
-        private void EstablishUser(string dataString) {
+        private void EstablishUser(string dataString, string submitToken) {
             _cardLoadingSpinnerActive = false;
 
             this._cardLoadingNotification?.Dismiss(true);
             this._pinEntryNotification?.Dismiss(true);
-            this._linkCodeEntryNotification?.Dismiss(true);
+            this._newOrLinkToExistingNotification?.Dismiss(true);
 
             string[] splitDataString = dataString.Split('|');
 
-            if (splitDataString.Length != 3) {
+            if (splitDataString.Length != 4) {
                 this.loginFailed();
                 return;
             }
@@ -510,74 +510,15 @@ namespace osum
 
             ArcadeUserData.HasAuth = true;
             ArcadeUserData.IsGuest = false;
-        }
 
-        private void loginFailed() {
-            this._cardLoadingNotification.Dismiss(false);
-
-            Notify(new Notification(
-               "Error has occured!",
-               "Login failed! Please try again later, or continue as guest!",
-               NotificationStyle.Okay
-            ));
-
+            this._loginProcessOccuring     = false;
             this._cardLoadingSpinnerActive = false;
         }
 
+
+
         //Handles the entire registration process for a entirely new card
-        private void RegisterNewCard(string cardId) {
-            this._cardLoadingNotification.Dismiss(true);
 
-            this._linkCodeEntryNotification = new Notification(
-                "Welcome to osu!arcade!",
-                "You are a new user, If you haven't already, create a osu!arcade link code in your account options panel, and enter it using the keypad on the side. This links this card to your Waffle account.",
-                NotificationStyle.PinEntry
-            );
-
-            _linkCodeEntryNotification.descriptionText.TextSize = 18;
-
-            this._linkCodeEntryNotification.PinEntryComplete += linkNotif => {
-                _pinEntryNotification = new Notification(
-                    "Welcome to osu!arcade!",
-                    "Additionally, please enter a PIN for your accounts security. This PIN will be required every time your card is swiped.\n\nUse the keypad on the side to enter your new PIN.",
-                    NotificationStyle.PinEntry
-                );
-
-                _pinEntryNotification.descriptionText.TextSize = 18;
-
-                _pinEntryNotification.PinEntryComplete += pinEntryNotif => {
-                    StringNetRequest arcadeLinkRequest = new StringNetRequest("http://localhost:80/stream/arcade-link", "POST", cardId + "\n" + linkNotif.EnteredPin + "\n" + pinEntryNotif.EnteredPin);
-
-                    arcadeLinkRequest.onFinish += (s, exception1) => {
-                        if (exception1 != null || s == "") {
-                            _pinEntryNotification.Dismiss(false);
-                            loginFailed();
-                            return;
-                        }
-
-                        string[] splitResponse = s.Split('\n');
-
-                        if (splitResponse.Length < 2) {
-                            _pinEntryNotification.Dismiss(false);
-                            loginFailed();
-                            return;
-                        }
-
-                        if (splitResponse[0] == "success") {
-                            EstablishUser(splitResponse[1]);
-                            _pinEntryNotification.Dismiss(true);
-                        }
-                    };
-
-                    NetManager.AddRequest(arcadeLinkRequest);
-                };
-
-                this._linkCodeEntryNotification.Dismiss(true);
-                Notify(this._pinEntryNotification);
-            };
-
-            Notify(this._linkCodeEntryNotification);
-        }
 
         /// <summary>
         /// Main update cycle
@@ -615,47 +556,13 @@ namespace osum
                                          break;
                                     case "CardData":
                                         if (splitCommand.Length >= 3) {
-                                            string cardType = splitCommand[2];
+                                            string cardType = splitCommand[1];
+                                            string cardName = splitCommand[2];
                                             string cardId = splitCommand[3];
 
-                                            string censoredCardId = cardId.Substring(0, 3);
-
-                                            for (int i = 0; i != (cardId.Length - 6); i++) {
-                                                censoredCardId += 'x';
+                                            if (!_loginProcessOccuring) {
+                                                this.ArcadeStartLoginProcess(cardId, cardType, cardName);
                                             }
-
-                                            censoredCardId += cardId.Substring(cardId.Length - 6, 3);
-
-                                            Scheduler.Add(() => {
-                                                this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardType + " Card with ID:\n" + censoredCardId;
-
-                                                StringNetRequest arcadeAuth = new StringNetRequest("http://localhost:80/stream/arcade-auth", "POST", cardId);
-
-                                                arcadeAuth.onFinish += (result, exception) => {
-                                                    if (exception != null || result == "") {
-                                                        loginFailed();
-                                                        return;
-                                                    }
-
-                                                    string[] splitResult = result.Split('\n');
-
-                                                    switch (splitResult.Length) {
-                                                        //Card is new
-                                                        case 1:
-                                                            this.RegisterNewCard(cardId);
-                                                            break;
-                                                        //Card exists
-                                                        case 2:
-                                                            this.LoginExistingCard(cardId, splitResult[1]);
-                                                            break;
-                                                        default:
-                                                            loginFailed();
-                                                            break;
-                                                    }
-                                                };
-
-                                                NetManager.AddRequest(arcadeAuth);
-                                            }, 1000);
                                         } else {
                                             loginFailed();
                                         }
@@ -726,47 +633,7 @@ namespace osum
             return true;
         }
 
-        private void LoginExistingCard(string cardId, string userDataLine) {
-            _cardLoadingNotification.Dismiss(true);
 
-            _pinEntryNotification = new Notification(
-                "Welcome to osu!arcade!",
-                "Please enter your Card PIN for authentication using the keypad on the side.",
-                NotificationStyle.PinEntry
-            );
-
-            _pinEntryNotification.PinEntryComplete += sender => {
-                StringNetRequest tokenRequest = new StringNetRequest("http://localhost:80/stream/arcade-token", "POST", cardId + "\n" + sender.EnteredPin);
-
-                tokenRequest.onFinish += (result, exception) => {
-                    if (exception != null || result == "") {
-                        this._pinEntryNotification.Dismiss(false);
-
-                        this.loginFailed();
-
-                        return;
-                    }
-
-                    if (result == "pin") {
-                        this._pinEntryNotification.Dismiss(true);
-
-                        Notify(new Notification("Authentication failed!", "The PIN you entered is incorrect! Please try logging in again.", NotificationStyle.Okay));
-
-                        this._cardLoadingSpinnerActive = false;
-
-                        return;
-                    }
-
-                    ArcadeUserData.Token = result;
-
-                    EstablishUser(userDataLine);
-                };
-
-                NetManager.AddRequest(tokenRequest);
-            };
-
-            Notify(_pinEntryNotification);
-        }
 
         /// <summary>
         /// Main draw cycle.

@@ -70,6 +70,7 @@
     <Compile Include="Audio\SoundEffectPlayerOpenAL.cs" />
     <Compile Include="Director.cs" />
     <Compile Include="GameBase.cs" />
+    <Compile Include="GameBase_ArcadeAuth.cs" />
     <Compile Include="GameModes\Empty.cs" />
     <Compile Include="GameModes\GameComponent.cs" />
     <Compile Include="GameModes\GameMode.cs" />
@@ -221,8 +222,10 @@
     <Compile Include="Support\IUpdateable.cs" />
     <Compile Include="Support\Transition.cs" />
     <Compile Include="UI\Notification.cs" />
+    <Compile Include="UI\Notification_PinEntry.cs" />
     <Compile Include="UI\SliderControl.cs" />
     <Compile Include="UI\TextInputNotification.cs" />
+    <Compile Include="UI\Notification_TextInput.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Bass.Net">

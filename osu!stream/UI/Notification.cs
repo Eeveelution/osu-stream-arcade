@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using System;
+using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 using osum.Audio;
@@ -12,21 +13,23 @@ using osum.Support.Desktop;
 
 namespace osum.UI
 {
-    public class Notification : SpriteManager
+    public partial class Notification : SpriteManager
     {
         public bool Dismissed;
-        private readonly BoolDelegate Action;
+        internal BoolDelegate Action;
 
         private NotificationStyle Style;
 
         internal pSprite okayButton;
         private pSprite cancelButton;
 
-        internal pText titleText, descriptionText, pinEntryText;
+        internal pText titleText, descriptionText, pinEntryText, yesText, noText, hiddenText;
 
-        public delegate void PinEntryCompletedDelegate(Notification sender);
+        internal string TextToHide;
 
-        public event PinEntryCompletedDelegate PinEntryComplete;
+        public delegate void InputEntryCompletedDelegate(Notification sender);
+
+        public event InputEntryCompletedDelegate InputEntryComplete;
 
         public Notification(string title, string description, NotificationStyle style, BoolDelegate action = null)
         {
@@ -34,7 +37,8 @@ namespace osum.UI
 
             pSprite back = new pSprite(TextureManager.Load(OsuTexture.notification_background), FieldTypes.StandardSnapCentre, OriginTypes.Centre, ClockTypes.Game, Vector2.Zero, 0.98f, true, Color4.White)
             {
-                DimImmune = true
+                DimImmune = true,
+                Scale     = (style == NotificationStyle.TextInput || style == NotificationStyle.PinEntry) ? new Vector2(1, 1.2f) : Vector2.One
             };
 
             titleText = new pText(title, 36, new Vector2(0, -130), new Vector2(600 * GameBase.SpriteToBaseRatio, 0), 1, true, Color4.White, true)
@@ -136,7 +140,7 @@ namespace osum.UI
 
                     Add(okayButton);
 
-                    pText okayText = new pText(LocalisationManager.GetString(OsuString.Yes), 24, new Vector2(-140, button_height), Vector2.Zero, 1, true, Color4.White, true)
+                    this.yesText = new pText(LocalisationManager.GetString(OsuString.Yes), 24, new Vector2(-140, button_height), Vector2.Zero, 1, true, Color4.White, true)
                     {
                         Field = FieldTypes.StandardSnapCentre,
                         Origin = OriginTypes.Centre,
@@ -144,7 +148,7 @@ namespace osum.UI
                         DimImmune = true
                     };
 
-                    Add(okayText);
+                    Add(this.yesText);
                 }
                 {
                     pDrawable additiveButton = null;
@@ -169,7 +173,7 @@ namespace osum.UI
 
                     Add(cancelButton);
 
-                    pText cancelText = new pText(LocalisationManager.GetString(OsuString.No), 24, new Vector2(140, button_height), Vector2.Zero, 1, true, Color4.White, true)
+                    this.noText = new pText(LocalisationManager.GetString(OsuString.No), 24, new Vector2(140, button_height), Vector2.Zero, 1, true, Color4.White, true)
                     {
                         Field = FieldTypes.StandardSnapCentre,
                         Origin = OriginTypes.Centre,
@@ -177,7 +181,7 @@ namespace osum.UI
                         DimImmune = true
                     };
 
-                    Add(cancelText);
+                    Add(this.noText);
                 }
                     break;
                 case NotificationStyle.Loading: {
@@ -197,17 +201,7 @@ namespace osum.UI
                     break;
                 }
                 case NotificationStyle.PinEntry: {
-                    GameWindowDesktop.Instance.Keyboard.KeyDown += pinEntryHandler;
-
-                    pinEntryText = new pText("_ _ _ _", 24, new Vector2(0, button_height), Vector2.Zero, 1, true, Color4.White, true)
-                    {
-                        Field     = FieldTypes.StandardSnapCentre,
-                        Origin    = OriginTypes.Centre,
-                        Clocking  = ClockTypes.Game,
-                        DimImmune = true
-                    };
-
-                    Add(pinEntryText);
+                    this.CreatePinEntry();
 
                     break;
                 }
@@ -217,88 +211,80 @@ namespace osum.UI
                     }, 1500);
                     break;
                 }
+                case NotificationStyle.HiddenText: {
+                    hiddenText = new pText("click to reveal", 24, new Vector2(0, button_height - 48), Vector2.Zero, 1, true, Color4.White, true)
+                    {
+                        Field     = FieldTypes.StandardSnapCentre,
+                        Origin    = OriginTypes.Centre,
+                        Clocking  = ClockTypes.Game,
+                        DimImmune = true
+                    };
+
+                    this.hiddenText.OnHover += HiddenTextOnOnHover;
+                    this.hiddenText.OnHoverLost += HiddenTextOnOnHoverLost;
+
+                    Add(hiddenText);
+
+                    pDrawable additiveButton = null;
+
+                    okayButton = new pSprite(TextureManager.Load(OsuTexture.notification_button_ok), new Vector2(0, button_height))
+                    {
+                        Field           = FieldTypes.StandardSnapCentre,
+                        Origin          = OriginTypes.Centre,
+                        Clocking        = ClockTypes.Game,
+                        DimImmune       = true,
+                        DrawDepth       = 0.99f,
+                        HandleClickOnUp = true
+                    };
+
+                    okayButton.OnHover += delegate { additiveButton = okayButton.AdditiveFlash(10000, 0.4f); };
+
+                    okayButton.OnHoverLost += delegate
+                    {
+                        additiveButton?.FadeOut(100);
+                    };
+
+                    okayButton.OnClick += delegate { this.Dismiss(true); };
+
+                    Add(okayButton);
+
+                    pText okayText = new pText(LocalisationManager.GetString(OsuString.Okay), 24, new Vector2(0, button_height), Vector2.Zero, 1, true, Color4.White, true)
+                    {
+                        Field     = FieldTypes.StandardSnapCentre,
+                        Origin    = OriginTypes.Centre,
+                        Clocking  = ClockTypes.Game,
+                        DimImmune = true
+                    };
+
+                    Add(okayText);
+
+                    break;
+                }
+                case NotificationStyle.TextInput: {
+                    this.CreateTextInput();
+                    break;
+                }
             }
         }
+        private void HiddenTextOnOnHover(object sender, EventArgs e) {
+            this.hiddenText.Text = this.TextToHide;
+        }
+        private void HiddenTextOnOnHoverLost(object sender, EventArgs e) {
+            this.hiddenText.Text = "click to reveal";
+        }
 
-        internal string EnteredPin = "";
+        internal string EnteredInput = "";
         private  int    enteredDigits = 0;
 
-        private void pinEntryHandler(object sender, KeyboardKeyEventArgs e) {
-            switch (e.Key) {
-                case Key.Number0:
-                case Key.Keypad0:
-                    this.EnteredPin += "0";
-                    break;
-                case Key.Number1:
-                case Key.Keypad1:
-                    this.EnteredPin += "1";
-                    break;
-                case Key.Number2:
-                case Key.Keypad2:
-                    this.EnteredPin += "2";
-                    break;
-                case Key.Number3:
-                case Key.Keypad3:
-                    this.EnteredPin += "3";
-                    break;
-                case Key.Number4:
-                case Key.Keypad4:
-                    this.EnteredPin += "4";
-                    break;
-                case Key.Number5:
-                case Key.Keypad5:
-                    this.EnteredPin += "5";
-                    break;
-                case Key.Number6:
-                case Key.Keypad6:
-                    this.EnteredPin += "6";
-                    break;
-                case Key.Number7:
-                case Key.Keypad7:
-                    this.EnteredPin += "7";
-                    break;
-                case Key.Number8:
-                case Key.Keypad8:
-                    this.EnteredPin += "8";
-                    break;
-                case Key.Number9:
-                case Key.Keypad9:
-                    this.EnteredPin += "9";
-                    break;
-            }
-
-            this.enteredDigits++;
-
-            switch (this.enteredDigits) {
-                case 0:
-                    this.pinEntryText.Text = "_ _ _ _";
-                    break;
-                case 1:
-                    this.pinEntryText.Text = "X _ _ _";
-                    break;
-                case 2:
-                    this.pinEntryText.Text = "X X _ _";
-                    break;
-                case 3:
-                    this.pinEntryText.Text = "X X X _";
-                    break;
-                case 4:
-                    this.pinEntryText.Text = "X X X X";
-
-                    if (PinEntryComplete != null) {
-                        PinEntryComplete(this);
-                    }
-                    break;
-            }
-        }
-
-        internal void Dismiss(bool completed)
+        internal void Dismiss(bool completed, bool invokeAction = true)
         {
             AudioEngine.PlaySample(OsuSamples.ButtonTap);
 
             GameBase.Scheduler.Add(delegate
             {
-                Action?.Invoke(completed);
+                if (invokeAction && this.Action != null) {
+                    Action.Invoke(completed);
+                }
                 Dismissed = true;
                 AlwaysDraw = false;
             }, 300);
@@ -307,8 +293,11 @@ namespace osum.UI
             ScaleTo(0.95f, 300, EasingTypes.Out);
             RotateTo(0.05f, 300, EasingTypes.Out);
 
-            if (this.Style == NotificationStyle.PinEntry) {
-                GameWindowDesktop.Instance.Keyboard.KeyDown -= pinEntryHandler;
+            switch (this.Style) {
+                case NotificationStyle.HiddenText:
+                    this.hiddenText.OnHover -= this.HiddenTextOnOnHover;
+                    this.hiddenText.OnHoverLost -= this.HiddenTextOnOnHoverLost;
+                    break;
             }
         }
 
@@ -329,6 +318,8 @@ namespace osum.UI
         YesNo,
         Loading,
         PinEntry,
-        Brief
+        Brief,
+        HiddenText,
+        TextInput
     }
 }

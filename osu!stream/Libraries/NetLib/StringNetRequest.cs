@@ -30,7 +30,7 @@ namespace osum.Libraries.NetLib
                 if (onFinish != null)
                 {
                     string output = null;
-                    if (data != null && error == null)
+                    if (data != null)
                         output = Encoding.UTF8.GetString(data);
                     onFinish(output, error);
                 }

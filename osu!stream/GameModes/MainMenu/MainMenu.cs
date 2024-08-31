@@ -54,7 +54,6 @@ namespace osum.GameModes.MainMenu
         private       TransformationF aicLogoFadeIn, aicLogoFadeOut;
         private       pText           aicLogoText;
         private const int             aicLogoFadingTime = 2000;
-        private       object          aicSeamlessMoveLock = new object();
 
         private float osuLogoOldRotation;
 
