@@ -35,6 +35,8 @@ namespace osum.Helpers
         private byte[] hash_info { get; set; }
         private byte[] hash_body { get; set; }
 
+        public string ContainerHash;
+
         //private readonly List<string> fMapFiles;
         private SortedDictionary<string, int> fMapIDsFiles;
         private Dictionary<string, DateTime> fFilesToAddDateCreated;
@@ -127,8 +129,13 @@ namespace osum.Helpers
             try
             {
                 fFilename = filename;
-                if (!fNotOnDisk)
-                    fHandle = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                if (!fNotOnDisk) {
+                    byte[] fileBytes = File.ReadAllBytes(filename);
+
+                    ContainerHash = BitConverter.ToString(SHA256.Create().ComputeHash(fileBytes)).Replace("-", "");
+
+                    fHandle = new MemoryStream(fileBytes);
+                }
 
                 init();
             }

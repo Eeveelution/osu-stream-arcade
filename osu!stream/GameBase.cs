@@ -256,7 +256,6 @@ namespace osum
             else
                 SpriteSheetResolution = 1920;
 
-
             //if we are switching to a new sprite sheet (resizing window on PC) let's refresh our textures.
             if (SpriteSheetResolution != oldResolution && oldResolution > 0)
                 TextureManager.ReloadAll();
@@ -458,7 +457,6 @@ namespace osum
         /// </summary>
         protected abstract void InitializeInput();
 
-
         /// <summary>
         /// Initializes the AssetManager.
         /// Assets are skins, hitsounds, textures that come with the game.
@@ -470,8 +468,6 @@ namespace osum
         {
             return new NativeAssetManager();
         }
-
-
 
         //Sets up all variables after the user is logged in
         //also creates the display on the main menu that the user is logged in
@@ -508,17 +504,13 @@ namespace osum
 
             Notify(new Notification("Welcome!", "Authentication successful!", NotificationStyle.Brief));
 
-            ArcadeUserData.HasAuth = true;
-            ArcadeUserData.IsGuest = false;
+            ArcadeUserData.HasAuth     = true;
+            ArcadeUserData.IsGuest     = false;
+            ArcadeUserData.SubmitToken = submitToken;
 
             this._loginProcessOccuring     = false;
             this._cardLoadingSpinnerActive = false;
         }
-
-
-
-        //Handles the entire registration process for a entirely new card
-
 
         /// <summary>
         /// Main update cycle

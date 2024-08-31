@@ -45,11 +45,12 @@ namespace osum.GameModes.SongSelect
 
             int period = 0;
 
-            rankingNetRequest = new StringNetRequest(@"https://osustream.com/score/retrieve.php", "POST",
-                "udid=" + GameBase.Instance.DeviceIdentifier +
-                "&filename=" + NetRequest.UrlEncode(Path.GetFileName(Player.Beatmap.ContainerFilename)) +
-                "&period=" + period +
-                "&difficulty=" + (int)Player.Difficulty);
+            string queryString =   "udid="        + GameBase.Config.GetValue("MachineKey", "")   +
+                                   "&ch="         + Player.Beatmap.Package.ContainerHash +
+                                   "&difficulty=" + (int)Player.Difficulty;
+
+            rankingNetRequest = new StringNetRequest(@"http://localhost:80/stream/arcade-ranking?" + queryString);
+
 
             rankingNetRequest.onFinish += rankingReceived;
 
@@ -81,17 +82,19 @@ namespace osum.GameModes.SongSelect
 
                     Score score = new Score
                     {
-                        Id = int.Parse(split[i++], GameBase.nfi),
-                        OnlineRank = int.Parse(split[i++], GameBase.nfi),
-                        Username = split[i++],
-                        hitScore = int.Parse(split[i++], GameBase.nfi),
-                        comboBonusScore = int.Parse(split[i++], GameBase.nfi),
-                        spinnerBonusScore = int.Parse(split[i++], GameBase.nfi),
-                        count300 = ushort.Parse(split[i++], GameBase.nfi),
-                        count100 = ushort.Parse(split[i++], GameBase.nfi),
-                        count50 = ushort.Parse(split[i++], GameBase.nfi),
-                        countMiss = ushort.Parse(split[i++], GameBase.nfi),
-                        maxCombo = ushort.Parse(split[i++], GameBase.nfi),
+                        Id                    = int.Parse(split[i++], GameBase.nfi),
+                        OnlineRank            = int.Parse(split[i++], GameBase.nfi),
+                        Username              = split[i++],
+                        hitScore              = int.Parse(split[i++], GameBase.nfi),
+                        comboBonusScore       = int.Parse(split[i++], GameBase.nfi),
+                        spinnerBonusScore     = int.Parse(split[i++], GameBase.nfi),
+                        count300              = ushort.Parse(split[i++], GameBase.nfi),
+                        count100              = ushort.Parse(split[i++], GameBase.nfi),
+                        count50               = ushort.Parse(split[i++], GameBase.nfi),
+                        countMiss             = ushort.Parse(split[i++], GameBase.nfi),
+                        maxCombo              = ushort.Parse(split[i++], GameBase.nfi),
+                        hitOffsetMilliseconds = int.Parse(split[i++], GameBase.nfi),
+
                         date = UnixTimestamp.Parse(int.Parse(split[i++], GameBase.nfi)),
                         guest = split[i++] == "1"
                     };
@@ -103,7 +106,7 @@ namespace osum.GameModes.SongSelect
                 text.Origin = OriginTypes.Centre;
                 text.Field = FieldTypes.StandardSnapTopCentre;
 
-                rankingSpriteManager.Add(text);
+                // rankingSpriteManager.Add(text);
 
                 int index = 0;
                 foreach (Score score in rankingScores)
@@ -120,7 +123,7 @@ namespace osum.GameModes.SongSelect
 
                 rankingSpriteManager.FadeInFromZero(300);
             }
-            catch
+            catch(Exception ex)
             {
                 GameBase.Notify(LocalisationManager.GetString(OsuString.InternetFailed), delegate { Ranking_Hide(); });
             }

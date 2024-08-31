@@ -281,7 +281,11 @@ namespace osum.GameModes.Results
             s_Footer.Alpha = 0;
             s_Footer.OnClick += delegate
             {
-                Director.ChangeMode(OsuMode.Play);
+                if (!ArcadeUserData.CreditOver()) {
+                    Director.ChangeMode(OsuMode.Play);
+                } else {
+                    ArcadeUserData.CreditOverReturnCatch();
+                }
                 AudioEngine.PlaySample(OsuSamples.MenuHit);
             };
             topMostLayer.Add(s_Footer);
@@ -345,44 +349,11 @@ namespace osum.GameModes.Results
 
         private void doSubmission()
         {
-            int deviceType = 0;
-#if iOS
-            if (!GameBase.Mapper)
+            if (ArcadeUserData.HasAuth && ArcadeUserData.SubmitToken != "")
             {
-                deviceType = (int)osum.Support.iPhone.HardwareDetection.Version;
-
-                //todo: for iOS5 twitter authentication, we need to double-check we actually have auth.
-                string hash = GameBase.Config.GetValue<string>("hash", null);
-                if (hash == null)
-                {
-                    //todo: no twitter auth. are we not submitting anymore?
-                    return;
-                }
-                else if (hash.StartsWith("ios-"))
-                {
-                    hash = hash.Substring(4);
-                    using (ACAccountStore store = new ACAccountStore())
-                    {
-                        ACAccount account = store.FindAccount(hash);
-                        if (account != null)
-                        {
-                            //yay, i think.
-                            //todo: test that this actually checks grants (it should in theory).
-                        }
-                        else
-                        {
-                            GameBase.Notify("Twitter authentication failed. Please visit the options screen to login again.");
-                            GameBase.Config.SetValue<string>("username", null);
-                            GameBase.Config.SetValue<string>("hash", null);
-                            GameBase.Config.SetValue<string>("twitterId", null);
-                            GameBase.Config.SaveConfig();
-                            return;
-                        }
-                    }
-                }
-
                 string check = CryptoHelper.GetMd5String("moocow" +
                     GameBase.Instance.DeviceIdentifier +
+                    ArcadeUserData.SubmitToken +
                     RankableScore.count100 +
                     RankableScore.count300 +
                     RankableScore.count50 +
@@ -393,12 +364,12 @@ namespace osum.GameModes.Results
                     RankableScore.accuracyBonusScore +
                     RankableScore.Ranking +
                     Path.GetFileName(Player.Beatmap.ContainerFilename) +
-                    deviceType +
                     RankableScore.hitScore +
                     (int)Player.Difficulty);
 
                 string postString =
-                    "udid=" + GameBase.Instance.DeviceIdentifier +
+                    "udid=" + GameBase.Config.GetValue("MachineKey", "") +
+                    "&st=" + ArcadeUserData.SubmitToken +
                     "&count300=" + RankableScore.count300 +
                     "&count100=" + RankableScore.count100 +
                     "&count50=" + RankableScore.count50 +
@@ -410,12 +381,9 @@ namespace osum.GameModes.Results
                     "&hitScore=" + RankableScore.hitScore +
                     "&rank=" + RankableScore.Ranking +
                     "&filename=" + NetRequest.UrlEncode(Path.GetFileName(Player.Beatmap.ContainerFilename)) +
-                    "&cc=" + GameBase.Config.GetValue<string>("hash", string.Empty) +
+                    "&ch=" + Player.Beatmap.Package.ContainerHash +
                     "&c=" + check +
                     "&difficulty=" + (int)Player.Difficulty +
-                    "&username=" + GameBase.Config.GetValue<string>("username", string.Empty) +
-                    "&twitterid=" + GameBase.Config.GetValue<string>("twitterId", string.Empty) +
-                    "&dt=" + deviceType +
                     "&offset=" + avg;
 
                 spriteSubmitting = new pSprite(TextureManager.Load(OsuTexture.songselect_audio_preview), FieldTypes.StandardSnapRight, OriginTypes.Centre, ClockTypes.Game, new Vector2(20, 20), 0.999f, true, Color4.White)
@@ -429,7 +397,7 @@ namespace osum.GameModes.Results
                 GameBase.MainSpriteManager.Add(spriteSubmitting);
                 spriteSubmitting.FadeInFromZero(300);
 
-                StringNetRequest nr = new StringNetRequest("https://www.osustream.com/score/submit.php", "POST", postString);
+                StringNetRequest nr = new StringNetRequest("http://localhost:80/stream/arcade-score-submit", "POST", postString);
                 nr.onFinish += delegate(string result, Exception e)
                 {
                     spriteSubmitting.AlwaysDraw = false;
@@ -454,7 +422,6 @@ namespace osum.GameModes.Results
                 };
                 NetManager.AddRequest(nr);
             }
-#endif
         }
 
         private bool cameFromSongSelect;

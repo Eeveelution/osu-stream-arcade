@@ -178,14 +178,8 @@ namespace osum.GameModes.SongSelect
 
             BeatmapDatabase.Initialize();
 
-#if !DIST
-            if (GameBase.Mapper)
-            {
-                //desktop/mapper builds.
-                recursiveBeatmaps(BeatmapPath);
-            }
-            else
-#endif
+            // recursiveBeatmaps(BeatmapPath);
+
             if (BeatmapDatabase.BeatmapInfo.Count > 0 && !ForceBeatmapRefresh && BeatmapDatabase.Version == BeatmapDatabase.DATABASE_VERSION)
             {
                 bool hasMissingMaps = false;

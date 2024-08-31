@@ -12,7 +12,7 @@ namespace osum {
 
         public static bool      HasAuth       = false;
         public static bool      IsGuest       = true;
-        public static string    Token         = "";
+        public static string    SubmitToken   = "";
         public static string    Username      = "";
         public static ulong     UserId        = 0;
         public static double    StatStreams   = 0.0;
@@ -50,7 +50,7 @@ namespace osum {
         public static void ResetLogin() {
             HasAuth       = false;
             IsGuest       = true;
-            Token         = "";
+            SubmitToken         = "";
             Username      = "";
             UserId        = 0;
             StatStreams   = 0.0;
