@@ -40,7 +40,11 @@ namespace osum {
             censoredCardId += cardId.Substring(cardId.Length - 6, 3);
 
             Scheduler.Add(() => {
-                this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardName + " Card with ID:\n" + censoredCardId;
+                // if (cardName != "") {
+                    this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardName + " Card with ID:\n" + censoredCardId;
+                // } else {
+                //     this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardType + " Card with ID:\n" + censoredCardId;
+                // }
 
                 string machineKey = Config.GetValue("MachineKey", "");
 
@@ -212,6 +216,9 @@ namespace osum {
                     Notify(pinRevealNotif);
 
                     this._newOrLinkToExistingNotification.Action = null;
+
+                    this._loginProcessOccuring     = false;
+                    this._cardLoadingSpinnerActive = false;
                 }
             };
 

@@ -132,12 +132,14 @@ namespace osum
         private SerialPort   _cardReaderPort;
         private BinaryReader _cardReaderBinaryReader;
 #if DEBUG
-        public static double LastFrameTime, LastUpdateTime;
+        public static double LastFrameTime, LastFrameTimeSync, LastUpdateTime;
 
         private pText updateTimeText, drawTimeText;
 #endif
 
-        private pSpriteText creditTimeText;
+        internal pSpriteText creditTimeText;
+        private  bool        _oldAuthState = ArcadeUserData.HasAuth;
+
         public GameBase(OsuMode mode = OsuMode.Unknown)
         {
             startupMode = mode;
@@ -417,7 +419,9 @@ namespace osum
             //MainSpriteManager.Add(this.updateTimeText);
 #endif
 
-            creditTimeText = new pSpriteText("00.00", "default", -2, FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(0, 12), 0.9f, true, Color4.White);
+            creditTimeText            = new pSpriteText("00.00", "default", -2, FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(10, 10), 0.9f, true, Color4.White);
+            this.creditTimeText.Alpha = 0;
+
             MainSpriteManager.Add(this.creditTimeText);
 
             string setSerialPort = Config.GetValue("CardReaderPort", "COM5");
@@ -431,7 +435,6 @@ namespace osum
                 this._cardReaderPort.Open();
 
                 _cardReaderBinaryReader = new BinaryReader(this._cardReaderPort.BaseStream);
-
                 Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
             }
         }
@@ -521,9 +524,9 @@ namespace osum
             if (this._cardReaderPort != null) {
                 while (this._cardReaderPort.BytesToRead > 0) {
                     try {
-                        char newData = _cardReaderBinaryReader.ReadChar();
+                        char newData = (char)_cardReaderBinaryReader.ReadByte();
 
-                        if (newData == '\n') {
+                        if (newData == '\n' || /* edga case for mifare card io */ newData == ']') {
                             string finishedLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
 
                             Console.WriteLine("AIC IO: " + finishedLine);
@@ -533,19 +536,15 @@ namespace osum
                             if (splitCommand.Length >= 1) {
                                 switch (splitCommand[0]) {
                                     case "CardSignal":
-                                         if (!this._cardLoadingSpinnerActive) {
+                                        if (!this._cardLoadingSpinnerActive) {
                                             _cardLoadingSpinnerActive = true;
 
-                                            _cardLoadingNotification = new Notification(
-                                                "Logging into the osu!arcade network!",
-                                                "Attempting to retrieve information about card.",
-                                                NotificationStyle.Loading
-                                            );
+                                            _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "Attempting to retrieve information about card.", NotificationStyle.Loading);
 
                                             Notify(this._cardLoadingNotification);
-                                         }
+                                        }
 
-                                         break;
+                                        break;
                                     case "CardData":
                                         if (splitCommand.Length >= 3) {
                                             string cardType = splitCommand[1];
@@ -559,6 +558,32 @@ namespace osum
                                             loginFailed();
                                         }
                                         break;
+                                    default:
+                                        if (!this._cardLoadingSpinnerActive) {
+                                            _cardLoadingSpinnerActive = true;
+
+                                            _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "", NotificationStyle.Loading);
+
+                                            Notify(this._cardLoadingNotification);
+
+                                            //Try to fallback to regular CardIO HID
+                                            string[] splitCardIO = finishedLine.Replace("-", "").Split('>');
+
+                                            if (splitCardIO.Length == 2) {
+                                                string cardId = splitCardIO[1].Replace("CardIO", "").Replace(" ", "");
+
+                                                string[] cardTypePart = splitCardIO[0].Split(':');
+
+                                                if (cardTypePart.Length == 2) {
+                                                    string cardType = cardTypePart[0].Replace(" ", "");
+
+                                                    if (!this._loginProcessOccuring) {
+                                                        this.ArcadeStartLoginProcess(cardId, cardType, "");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        break;
                                 }
                             }
 
@@ -567,7 +592,10 @@ namespace osum
                             this._cardReaderBuffer.Add(newData);
                         }
                     }
-                    catch {
+                    catch (ArgumentException) {
+                        /* This happens whenever the "auth block smth smth" comes up because of a fucked UTF8 char... no idea why.. */
+                    }
+                    catch (Exception e){
                         string existingLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
                         Console.WriteLine("Line before read err: " + existingLine);
 
@@ -587,6 +615,16 @@ namespace osum
 
                         this._cardReaderBuffer.Clear();
                     }
+                }
+            }
+
+            if (this._oldAuthState != ArcadeUserData.HasAuth) {
+                this._oldAuthState = ArcadeUserData.HasAuth;
+
+                if (ArcadeUserData.HasAuth) {
+                    GameBase.Instance.creditTimeText.FadeInFromZero(1500);
+                } else {
+                    GameBase.Instance.creditTimeText.FadeOut(1500);
                 }
             }
 
@@ -640,7 +678,8 @@ namespace osum
 
             Director.Draw();
 
-            drawTimeText.Text   = $"frame: {LastFrameTime}ms ({Math.Round(1000.0f / LastFrameTime, 2)}fps)";
+            //drawTimeText.Text = $"frame: {LastFrameTime}ms ({Math.Round(1000.0f / LastFrameTime, 2)}fps)\nwith sync: {LastFrameTimeSync}ms ({Math.Round(1000.0f / LastFrameTimeSync, 2)}fps)";
+            drawTimeText.Text = $"frame: {Math.Round(LastFrameTimeSync, 1)}ms ({Math.Round(1000.0f / LastFrameTimeSync)}fps)";
             //updateTimeText.Text = $"update: {LastUpdateTime}ms ({Math.Round(1000.0f / LastUpdateTime, 2)}fps)";
 
             MainSpriteManager.Draw();

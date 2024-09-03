@@ -503,21 +503,23 @@ namespace osum.GameModes.MainMenu
 
                 }
                 //If auth state changed, and we're no longer logged in, and the panel isn't already fading. fade it out.
-                else if(!userPanelFading) {
-                    userPanelFading = true;
+                else {
+                    if(!userPanelFading) {
+                        userPanelFading = true;
 
-                    Transformation fadeOut = new TransformationF(TransformationType.Fade, 0.98f, 0.0f, Clock.ModeTime + 1300, Clock.ModeTime + 1700);
+                        Transformation fadeOut = new TransformationF(TransformationType.Fade, 0.98f, 0.0f, Clock.ModeTime + 1300, Clock.ModeTime + 1700);
 
-                    GameBase.Scheduler.Add(delegate {
-                        userPanelFading = false;
-                    }, Clock.ModeTime + 1700);
+                        GameBase.Scheduler.Add(delegate {
+                            userPanelFading = false;
+                        }, Clock.ModeTime + 1700);
 
-                    userBackground?.Transform(fadeOut);
-                    userRankBadge?.Transform(fadeOut);
-                    userStatsText?.Transform(fadeOut);
-                    usernameText?.Transform(fadeOut);
+                        userBackground?.Transform(fadeOut);
+                        userRankBadge?.Transform(fadeOut);
+                        userStatsText?.Transform(fadeOut);
+                        usernameText?.Transform(fadeOut);
 
-                    this.RestartAmusementIcFading();
+                        this.RestartAmusementIcFading();
+                    }
                 }
             }
 

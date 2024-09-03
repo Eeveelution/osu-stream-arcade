@@ -25,6 +25,9 @@ namespace osum.Support.Desktop
             : base(1280, 720, GraphicsMode.Default, "osu!stream")
         {
             VSync    = VSyncMode.On;
+
+            //WindowState = WindowState.Fullscreen;
+
             Instance = this;
             //GameBase.WindowSize = new Size(960,640);
         }
@@ -51,6 +54,9 @@ namespace osum.Support.Desktop
         {
             switch (e.KeyChar)
             {
+                case 'q':
+                    this.Exit();
+                    break; 
                 case 'a':
                     Player.Autoplay = !Player.Autoplay;
                     break;
@@ -213,12 +219,15 @@ namespace osum.Support.Desktop
 
             if (GameBase.Instance != null) GameBase.Instance.Draw();
 #if DEBUG
-            frameTime.Stop();
+
 
             GameBase.LastFrameTime = ((double)frameTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
 #endif
             // display
             SwapBuffers();
+
+            frameTime.Stop();
+            GameBase.LastFrameTimeSync = ((double)frameTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
 
         }
     }
