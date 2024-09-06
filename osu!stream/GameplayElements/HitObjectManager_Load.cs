@@ -188,13 +188,13 @@ namespace osum.GameplayElements
                                 switch (key)
                                 {
                                     case "HPDrainRate":
-                                        beatmap.DifficultyHpDrainRate = Math.Min((byte)10, Math.Max((byte)0, byte.Parse(val)));
+                                        beatmap.DifficultyHpDrainRate = (byte)Math.Min(10, Math.Max(0, float.Parse(val)));
                                         break;
                                     case "CircleSize":
-                                        beatmap.DifficultyCircleSize = Math.Min((byte)10, Math.Max((byte)0, byte.Parse(val)));
+                                        beatmap.DifficultyCircleSize = (byte)Math.Min(10, Math.Max(0, float.Parse(val)));
                                         break;
                                     case "OverallDifficulty":
-                                        beatmap.DifficultyOverall = Math.Min((byte)10, Math.Max((byte)0, byte.Parse(val)));
+                                        beatmap.DifficultyOverall = (byte)Math.Min(10, Math.Max(0, float.Parse(val)));
                                         //if (!hasApproachRate) DifficultyApproachRate = DifficultyOverall;
                                         break;
                                     case "SliderMultiplier":

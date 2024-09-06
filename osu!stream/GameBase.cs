@@ -526,7 +526,7 @@ namespace osum
                     try {
                         char newData = (char)_cardReaderBinaryReader.ReadByte();
 
-                        if (newData == '\n' || /* edga case for mifare card io */ newData == ']') {
+                        if (newData == '\n' ) {
                             string finishedLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
 
                             Console.WriteLine("AIC IO: " + finishedLine);
@@ -560,16 +560,10 @@ namespace osum
                                         break;
                                     default:
                                         if (!this._cardLoadingSpinnerActive) {
-                                            _cardLoadingSpinnerActive = true;
-
-                                            _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "", NotificationStyle.Loading);
-
-                                            Notify(this._cardLoadingNotification);
-
                                             //Try to fallback to regular CardIO HID
                                             string[] splitCardIO = finishedLine.Replace("-", "").Split('>');
 
-                                            if (splitCardIO.Length == 2) {
+                                            if (splitCardIO.Length == 2 && splitCardIO[1].Contains("CardIO")) {
                                                 string cardId = splitCardIO[1].Replace("CardIO", "").Replace(" ", "");
 
                                                 string[] cardTypePart = splitCardIO[0].Split(':');
@@ -577,9 +571,27 @@ namespace osum
                                                 if (cardTypePart.Length == 2) {
                                                     string cardType = cardTypePart[0].Replace(" ", "");
 
-                                                    if (!this._loginProcessOccuring) {
-                                                        this.ArcadeStartLoginProcess(cardId, cardType, "");
+                                                    switch (cardType) {
+                                                        case "MIFARE":
+                                                        case "FeliCa":
+                                                        case "15693":
+                                                        case "None":
+                                                            if (!this._loginProcessOccuring) {
+                                                                _cardLoadingSpinnerActive = true;
+
+                                                                _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "", NotificationStyle.Loading);
+
+                                                                Notify(this._cardLoadingNotification);
+
+                                                                this.ArcadeStartLoginProcess(cardId, cardType, "");
+                                                            }
+                                                            break;
+                                                        default:
+                                                            Console.WriteLine($"WEIRD CARD TYPE: \"{cardType}\"");
+                                                            break;
                                                     }
+
+
                                                 }
                                             }
                                         }

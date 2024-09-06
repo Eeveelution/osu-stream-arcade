@@ -52,7 +52,7 @@ namespace BeatmapCombinator
                         Process(d, false, true, true);
 
                         //.osz
-                        Process(d);
+                        //Process(d, false, false);
                     }
                 }
                 else
@@ -160,13 +160,13 @@ namespace BeatmapCombinator
                                 switch (key)
                                 {
                                     case "HPDrainRate":
-                                        bd.DifficultyHpDrainRate = Math.Min((byte)10, Math.Max((byte)0, byte.Parse(val)));
+                                        bd.DifficultyHpDrainRate = (byte)Math.Min(10, Math.Max(0, double.Parse(val)));
                                         break;
                                     case "CircleSize":
-                                        bd.DifficultyCircleSize = Math.Min((byte)10, Math.Max((byte)0, byte.Parse(val)));
+                                        bd.DifficultyCircleSize = (byte)Math.Min(10, Math.Max(0, double.Parse(val)));
                                         break;
                                     case "OverallDifficulty":
-                                        bd.DifficultyOverall = Math.Min((byte)10, Math.Max((byte)0, byte.Parse(val)));
+                                        bd.DifficultyOverall = (byte)Math.Min(10, Math.Max(0, double.Parse(val)));
                                         //if (!hasApproachRate) DifficultyApproachRate = DifficultyOverall;
                                         break;
                                     case "SliderMultiplier":
@@ -470,12 +470,13 @@ namespace BeatmapCombinator
             }
             else
             {
+                if (orderedDifficulties[(int)Difficulty.Expert] != null)
+                    headerContent.Add("3: " + processDifficulty(Difficulty.Expert).ToString("G17", nfi));
                 if (orderedDifficulties[(int)Difficulty.Easy] != null)
                     headerContent.Add("0: " + processDifficulty(Difficulty.Easy).ToString("G17", nfi));
                 if (orderedDifficulties[(int)Difficulty.Normal] != null)
                     headerContent.Add("1: " + processDifficulty(Difficulty.Normal).ToString("G17", nfi));
-                if (orderedDifficulties[(int)Difficulty.Expert] != null)
-                    headerContent.Add("3: " + processDifficulty(Difficulty.Expert).ToString("G17", nfi));
+
             }
 
             if (healthMultiplier != 0)
@@ -798,7 +799,7 @@ namespace BeatmapCombinator
                         while (true)
                         {
                             Clock.UpdateCustom(0.01);
-                            source.InternalTime += 0.01;
+                            source.InternalTime += 0.5;
 
                             p.Update();
 

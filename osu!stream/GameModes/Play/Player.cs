@@ -333,7 +333,7 @@ namespace osum.GameModes.Play
                 if (Beatmap.Package != null)
                     HitObjectManager.LoadFile();
             }
-            catch
+            catch(Exception e)
             {
                 HitObjectManager?.Dispose();
                 HitObjectManager = null;

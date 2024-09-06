@@ -39,12 +39,16 @@ namespace osum {
 
             censoredCardId += cardId.Substring(cardId.Length - 6, 3);
 
+            Console.WriteLine("got to censoring card id");
+
             Scheduler.Add(() => {
-                // if (cardName != "") {
+                if (cardName != "") {
                     this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardName + " Card with ID:\n" + censoredCardId;
-                // } else {
-                //     this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardType + " Card with ID:\n" + censoredCardId;
-                // }
+                } else {
+                    this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardType + " Card with ID:\n" + censoredCardId;
+                }
+
+                Console.WriteLine("notif description set");
 
                 string machineKey = Config.GetValue("MachineKey", "");
 
