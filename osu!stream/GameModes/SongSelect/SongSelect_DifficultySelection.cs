@@ -51,6 +51,10 @@ namespace osum.GameModes.SongSelect
             cancelHoverPreview();
             cancelLockedHoverPreview();
 
+            if (panel == null) {
+                Console.WriteLine("SCREAM");
+            }
+
             SelectedPanel = panel;
             Player.Beatmap = panel.Beatmap;
 
@@ -510,13 +514,7 @@ namespace osum.GameModes.SongSelect
 
             s_Footer.AdditiveFlash(500, 0.5f);
 
-            GameBase.Scheduler.Add(delegate {
-                Director.ChangeMode(OsuMode.Play);
-
-                GameBase.Scheduler.Add(delegate {
-                    leaveDifficultySelection(sender, args, true);
-                }, 1000);
-            }, 800);
+            Director.ChangeMode(OsuMode.Play);
         }
     }
 }

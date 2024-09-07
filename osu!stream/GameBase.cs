@@ -129,7 +129,8 @@ namespace osum
 
         private readonly OsuMode startupMode;
 
-        private SerialPort   _cardReaderPort;
+        internal SerialPort   _cardReaderPort;
+        private Thread       _cardReaderThread;
         private BinaryReader _cardReaderBinaryReader;
 #if DEBUG
         public static double LastFrameTime, LastFrameTimeSync, LastUpdateTime;
@@ -429,10 +430,13 @@ namespace osum
             if (SerialPort.GetPortNames().Contains(setSerialPort)) {
                 this._cardReaderPort             = new SerialPort(setSerialPort, 115200);
                 this._cardReaderPort.Handshake   = Handshake.None;
-                this._cardReaderPort.ReadTimeout = 500;
+                //this._cardReaderPort.ReadTimeout = 1000;
                 this._cardReaderPort.RtsEnable   = true;
                 this._cardReaderPort.DtrEnable   = true;
                 this._cardReaderPort.Open();
+
+                _cardReaderThread = new Thread(CardReaderThread);
+                _cardReaderThread.Start();
 
                 _cardReaderBinaryReader = new BinaryReader(this._cardReaderPort.BaseStream);
                 Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
@@ -521,122 +525,13 @@ namespace osum
         /// <returns>true if a draw should occur</returns>
         public bool Update()
         {
-            if (this._cardReaderPort != null) {
-                while (this._cardReaderPort.BytesToRead > 0) {
-                    try {
-                        char newData = (char)_cardReaderBinaryReader.ReadByte();
-
-                        if (newData == '\n' ) {
-                            string finishedLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
-
-                            Console.WriteLine("AIC IO: " + finishedLine);
-
-                            string[] splitCommand = finishedLine.Split('|');
-
-                            if (splitCommand.Length >= 1) {
-                                switch (splitCommand[0]) {
-                                    case "CardSignal":
-                                        if (!this._cardLoadingSpinnerActive) {
-                                            _cardLoadingSpinnerActive = true;
-
-                                            _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "Attempting to retrieve information about card.", NotificationStyle.Loading);
-
-                                            Notify(this._cardLoadingNotification);
-                                        }
-
-                                        break;
-                                    case "CardData":
-                                        if (splitCommand.Length >= 3) {
-                                            string cardType = splitCommand[1];
-                                            string cardName = splitCommand[2];
-                                            string cardId = splitCommand[3];
-
-                                            if (!_loginProcessOccuring) {
-                                                this.ArcadeStartLoginProcess(cardId, cardType, cardName);
-                                            }
-                                        } else {
-                                            loginFailed();
-                                        }
-                                        break;
-                                    default:
-                                        if (!this._cardLoadingSpinnerActive) {
-                                            //Try to fallback to regular CardIO HID
-                                            string[] splitCardIO = finishedLine.Replace("-", "").Split('>');
-
-                                            if (splitCardIO.Length == 2 && splitCardIO[1].Contains("CardIO")) {
-                                                string cardId = splitCardIO[1].Replace("CardIO", "").Replace(" ", "");
-
-                                                string[] cardTypePart = splitCardIO[0].Split(':');
-
-                                                if (cardTypePart.Length == 2) {
-                                                    string cardType = cardTypePart[0].Replace(" ", "");
-
-                                                    switch (cardType) {
-                                                        case "MIFARE":
-                                                        case "FeliCa":
-                                                        case "15693":
-                                                        case "None":
-                                                            if (!this._loginProcessOccuring) {
-                                                                _cardLoadingSpinnerActive = true;
-
-                                                                _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "", NotificationStyle.Loading);
-
-                                                                Notify(this._cardLoadingNotification);
-
-                                                                this.ArcadeStartLoginProcess(cardId, cardType, "");
-                                                            }
-                                                            break;
-                                                        default:
-                                                            Console.WriteLine($"WEIRD CARD TYPE: \"{cardType}\"");
-                                                            break;
-                                                    }
-
-
-                                                }
-                                            }
-                                        }
-                                        break;
-                                }
-                            }
-
-                            this._cardReaderBuffer.Clear();
-                        } else {
-                            this._cardReaderBuffer.Add(newData);
-                        }
-                    }
-                    catch (ArgumentException) {
-                        /* This happens whenever the "auth block smth smth" comes up because of a fucked UTF8 char... no idea why.. */
-                    }
-                    catch (Exception e){
-                        string existingLine = new string(this._cardReaderBuffer.ToArray()).Replace("\r", "");
-                        Console.WriteLine("Line before read err: " + existingLine);
-
-                        this._cardLoadingNotification?.Dismiss(false);
-
-                        if (_cardReadErrNotification == null || _cardReadErrNotification.Dismissed) {
-                            this._cardReadErrNotification = new Notification(
-                                "Failed to read card!",
-                                "The Data on your card could not be successfully read. Make sure your card is not damaged in any way that could hinder the reader from receiving correct data!",
-                                NotificationStyle.Okay
-                            );
-
-                            Scheduler.Add(() => {
-                                Notify(this._cardReadErrNotification);
-                            }, 500);
-                        }
-
-                        this._cardReaderBuffer.Clear();
-                    }
-                }
-            }
-
             if (this._oldAuthState != ArcadeUserData.HasAuth) {
                 this._oldAuthState = ArcadeUserData.HasAuth;
 
                 if (ArcadeUserData.HasAuth) {
-                    GameBase.Instance.creditTimeText.FadeInFromZero(1500);
+                    Instance.creditTimeText.FadeInFromZero(1500);
                 } else {
-                    GameBase.Instance.creditTimeText.FadeOut(1500);
+                    Instance.creditTimeText.FadeOut(1500);
                 }
             }
 

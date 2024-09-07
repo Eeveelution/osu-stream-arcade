@@ -223,6 +223,7 @@ namespace osum.GameModes.Play.Components
                     }
                 }));
             } else {
+                Player.SongSelectForceBeatmap = true;
                 Director.ChangeMode(OsuMode.SongSelect);
             }
 

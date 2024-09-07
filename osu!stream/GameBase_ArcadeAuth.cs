@@ -42,6 +42,10 @@ namespace osum {
             Console.WriteLine("got to censoring card id");
 
             Scheduler.Add(() => {
+                if (_cardLoadingNotification == null) {
+                    _cardLoadingNotification = new Notification("Logging in...", "", NotificationStyle.Loading);
+                }
+
                 if (cardName != "") {
                     this._cardLoadingNotification.descriptionText.Text = "Attempting login using " + cardName + " Card with ID:\n" + censoredCardId;
                 } else {

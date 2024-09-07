@@ -18,6 +18,7 @@ namespace osum.Support.Desktop
             Window = new GameWindowDesktop();
             Window.Run();
             Director.CurrentMode.Dispose();
+            Instance._cardReaderPort.Close();
         }
 
         protected override BackgroundAudioPlayer InitializeBackgroundAudio()
@@ -55,6 +56,7 @@ namespace osum.Support.Desktop
 
         public void Exit()
         {
+
             Window.Exit();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using OpenTK;
 using OpenTK.Graphics;
@@ -188,13 +189,13 @@ namespace osum.GameplayElements
                                 switch (key)
                                 {
                                     case "HPDrainRate":
-                                        beatmap.DifficultyHpDrainRate = (byte)Math.Min(10, Math.Max(0, float.Parse(val)));
+                                        beatmap.DifficultyHpDrainRate = (byte)Math.Min(10, Math.Max(0, double.Parse(val, GameBase.nfi)));
                                         break;
                                     case "CircleSize":
-                                        beatmap.DifficultyCircleSize = (byte)Math.Min(10, Math.Max(0, float.Parse(val)));
+                                        beatmap.DifficultyCircleSize = (byte)Math.Min(10, Math.Max(0, double.Parse(val, GameBase.nfi)));
                                         break;
                                     case "OverallDifficulty":
-                                        beatmap.DifficultyOverall = (byte)Math.Min(10, Math.Max(0, float.Parse(val)));
+                                        beatmap.DifficultyOverall = (byte)Math.Min(10, Math.Max(0, double.Parse(val, GameBase.nfi)));
                                         //if (!hasApproachRate) DifficultyApproachRate = DifficultyOverall;
                                         break;
                                     case "SliderMultiplier":
@@ -205,10 +206,10 @@ namespace osum.GameplayElements
                                         beatmap.DifficultySliderTickRate =
                                             Math.Max(0.5, Math.Min(8, double.Parse(val, GameBase.nfi)));
                                         break;
-                                    /*case "ApproachRate":
-                                        beatmap.DifficultyApproachRate = Math.Min((byte)10, Math.Max((byte)0, byte.Parse(val)));
-                                        hasApproachRate = true;
-                                        break;*/
+                                    case "ApproachRate":
+                                        beatmap.DifficultyApproachRate = Math.Min(10.0, Math.Max(0.0, double.Parse(val, GameBase.nfi)));
+                                        // hasApproachRate = true;
+                                        break;
                                 }
 
                                 break;

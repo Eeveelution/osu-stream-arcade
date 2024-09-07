@@ -8,7 +8,7 @@ using osum.UI;
 namespace osum {
     public class ArcadeUserData {
         private const int CreditLength = 10 * 60 * 1000;
-        // private const int CreditLength = 15000;
+        //private const int CreditLength = 15000;
 
         public static bool      HasAuth       = false;
         public static bool      IsGuest       = true;

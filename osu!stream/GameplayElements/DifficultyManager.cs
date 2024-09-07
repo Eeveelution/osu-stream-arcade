@@ -1,5 +1,8 @@
-﻿using osum.GameModes.Play;
+﻿using System.Collections.Generic;
+using System.Linq;
+using osum.GameModes.Play;
 using osum.GameModes.Play.Components;
+using osum.Helpers;
 
 namespace osum.GameplayElements
 {
@@ -45,6 +48,37 @@ namespace osum.GameplayElements
 
         public static int SliderVelocity = 300;
 
+        // Source is lazer: osu.Game.Rulesets.Osu/Objects/OsuHitObject.cs
+        /// <summary>
+        /// Minimum preempt time at AR=10.
+        /// </summary>
+        public const double PREEMPT_MIN = 450;
+
+        /// <summary>
+        /// Median preempt time at AR=5.
+        /// </summary>
+        public const double PREEMPT_MID = 1200;
+
+        /// <summary>
+        /// Maximum preempt time at AR=0.
+        /// </summary>
+        public const double PREEMPT_MAX = 1800;
+
+        // Source is lazer: osu.Game/Beatmaps/IBeatmapDifficultyInfo.cs
+        private static double DifficultyRange(double difficulty) => (difficulty - 5) / 5;
+
+        private static double DifficultyRange(double difficulty, double min, double mid, double max) {
+            if (difficulty > 5) {
+                return mid + (max - mid) * DifficultyRange(difficulty);
+            }
+
+            if (difficulty < 5) {
+                return mid + (mid - min) * DifficultyRange(difficulty);
+            }
+
+            return mid;
+        }
+
         public static int PreEmpt
         {
             get
@@ -56,7 +90,12 @@ namespace osum.GameplayElements
                     default:
                         return 1000;
                     case Difficulty.Expert:
-                        return 800;
+                        string packId = Player.Beatmap.Package.GetMetadata(MapMetaType.PackId);
+                        if (!string.IsNullOrEmpty(packId) && packId.Contains("custom")) {
+                            return (int)DifficultyRange(Player.Beatmap.DifficultyApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
+                        } else {
+                            return 800;
+                        }
                 }
             }
         }

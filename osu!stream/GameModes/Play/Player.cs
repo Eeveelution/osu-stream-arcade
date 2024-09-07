@@ -61,6 +61,10 @@ namespace osum.GameModes.Play
         /// The beatmap currently being played.
         /// </summary>
         public static Beatmap Beatmap;
+        /// <summary>
+        /// Flag to prevent song select from immediately jumping to the map if beatmap isnt null
+        /// </summary>
+        public static bool SongSelectForceBeatmap = false;
 
         /// <summary>
         /// The difficulty which will be used for play mode (Easy/Standard/Expert).

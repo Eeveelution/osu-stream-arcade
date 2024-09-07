@@ -43,7 +43,7 @@ namespace osum.GameModes.SongSelect
         private BeatmapPanel SelectedPanel;
         private BeatmapPanel PreviewingPanel;
 
-        private pDrawable s_ButtonBack;
+        private pDrawable s_ButtonBack;s
 
         private SelectState State;
 
@@ -112,10 +112,10 @@ namespace osum.GameModes.SongSelect
 
             topmostSpriteManager.Add(s_ButtonBack = new BackButton(onBackPressed, Director.LastOsuMode == OsuMode.MainMenu));
 
-            if (Player.Beatmap != null)
+            if (Player.Beatmap != null && Player.SongSelectForceBeatmap) {
+                Player.SongSelectForceBeatmap = false;
                 showDifficultySelection(panels.Find(p => p.Beatmap != null && p.Beatmap.ContainerFilename == Player.Beatmap.ContainerFilename), true);
-            else
-            {
+            } else {
                 InitializeBgm();
 
                 s_Header.Transform(new TransformationV(new Vector2(0, -15), Vector2.Zero, 0, 800, EasingTypes.In));
@@ -147,9 +147,7 @@ namespace osum.GameModes.SongSelect
                             "Your timer has expired! You can either play this map, or quit. Do you want to quit?", NotificationStyle.YesNo,
                             b => {
                                 if (b) {
-                                    ArcadeUserData.CreditOverReturnCatch(() => {
-                                        leaveDifficultySelection(sender, args);
-                                    });
+                                    ArcadeUserData.CreditOverReturnCatch();
                                 }
                             }));
                     } else {
