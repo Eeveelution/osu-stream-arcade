@@ -43,7 +43,7 @@ namespace osum.GameModes.SongSelect
         private BeatmapPanel SelectedPanel;
         private BeatmapPanel PreviewingPanel;
 
-        private pDrawable s_ButtonBack;s
+        private pDrawable s_ButtonBack;
 
         private SelectState State;
 
