@@ -1,27 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using OpenTK;
 
 namespace osum.Helpers
 {
     public static class pMathHelper
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float ToDegrees(float radians)
         {
             return (radians * 57.29578f);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float ToRadians(float degrees)
         {
             return (degrees * 0.01745329f);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Lerp(float start, float end, float amount)
         {
             return start + ((end - start) * amount);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Distance(Vector2 value1, Vector2 value2)
         {
             float num2 = value1.X - value2.X;
@@ -30,6 +35,7 @@ namespace osum.Helpers
             return (float)Math.Sqrt(num3);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float DistanceSquared(Vector2 value1, Vector2 value2)
         {
             float num2 = value1.X - value2.X;
@@ -37,6 +43,7 @@ namespace osum.Helpers
             return ((num2 * num2) + (num * num));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Point2Vector(PointF point)
         {
             return new Vector2(point.X, point.Y);
@@ -44,6 +51,7 @@ namespace osum.Helpers
 
         private static readonly List<Vector2> working = new List<Vector2>();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Vector2 BezierPoint(ref List<Vector2> input, float t)
         {
             int count = input.Count;
@@ -67,6 +75,7 @@ namespace osum.Helpers
         private const float MIN_LENGTH_SQUARED = 4.0f; // square of distance at which subdivision should stop anyway
         private const float MAX_ANGLE_SIN = 0.1305261922f; // sine of maximum angle permitted between segments
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static List<Vector2> CreateBezier(List<Vector2> input)
         {
             List<Vector2> output = new List<Vector2>();
@@ -199,6 +208,7 @@ namespace osum.Helpers
                 output.Add(p0 + (p1 - p0) * ((float)j / segments));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static float ClampToOne(float p)
         {
             return Math.Max(0, Math.Min(1, p));

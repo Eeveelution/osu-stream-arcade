@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using OpenTK;
 using OpenTK.Graphics;
 using osum.Helpers;
@@ -185,6 +186,7 @@ namespace osum.Graphics.Sprites
 
         internal int Duration => EndTime - StartTime;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual float CalculateCurrent(float start, float end)
         {
             float progress = (float)(now - StartTime) / Duration;
@@ -236,6 +238,7 @@ namespace osum.Graphics.Sprites
         /// Offsets the transformation by the specified amount.
         /// </summary>
         /// <param name="amount">Number of milliseconds to offset by.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Offset(int amount)
         {
             EndTime += amount;
@@ -247,6 +250,7 @@ namespace osum.Graphics.Sprites
             return string.Format("{2} {0}-{1}", StartTime, EndTime, Type);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void Update(int time)
         {
             now = time;
