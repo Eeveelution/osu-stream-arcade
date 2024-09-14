@@ -219,7 +219,8 @@ namespace osum.Support.Desktop
 #endif
             base.OnRenderFrame(e);
 
-            if (GameBase.Instance != null) GameBase.Instance.Draw();
+
+            if (GameBase.Instance != null) GameBase.Instance.Draw(e.Time);
 #if DEBUG
 
 

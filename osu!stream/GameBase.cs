@@ -132,11 +132,9 @@ namespace osum
         internal SerialPort   _cardReaderPort;
         private Thread       _cardReaderThread;
         private BinaryReader _cardReaderBinaryReader;
-#if DEBUG
         public static double LastFrameTime, LastFrameTimeSync, LastUpdateTime;
 
         private pText updateTimeText, drawTimeText;
-#endif
 
         internal pSpriteText creditTimeText;
         private  bool        _oldAuthState = ArcadeUserData.HasAuth;
@@ -412,13 +410,13 @@ namespace osum
 #endif
 
             Clock.Start();
-#if DEBUG
+
             this.drawTimeText = new pText("frame: 0.0ms (0fps)", 10, new Vector2(0, 0), 1.0f, true, Color4.White);
             this.updateTimeText = new pText("update: 0.0ms (0ups)", 10, new Vector2(0, 12), 1.0f, true, Color4.White);
 
             MainSpriteManager.Add(this.drawTimeText);
             //MainSpriteManager.Add(this.updateTimeText);
-#endif
+
 
             creditTimeText            = new pSpriteText("00.00", "default", -2, FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(10, 10), 0.9f, true, Color4.White);
             this.creditTimeText.Alpha = 0;
@@ -570,13 +568,27 @@ namespace osum
             return true;
         }
 
-
+        private double _deltaAccumulator;
+        private int    _frameAccumulator;
 
         /// <summary>
         /// Main draw cycle.
         /// </summary>
-        public void Draw()
+        public void Draw(double delta)
         {
+            #if RELEASE
+            this._deltaAccumulator += delta;
+            this._frameAccumulator += 1;
+
+            if (this._deltaAccumulator >= 1.0f) {
+                this._deltaAccumulator = 0;
+
+                drawTimeText.Text = $"frames: {Math.Round(1000.0 / (double)_frameAccumulator, 2)}ms ({_frameAccumulator}fps)";
+
+                this._frameAccumulator = 0;
+            }
+
+            #endif
             SpriteManager.Reset();
 
             if (Director.ActiveTransition == null || !Director.ActiveTransition.SkipScreenClear)
@@ -587,7 +599,9 @@ namespace osum
 
             //drawTimeText.Text = $"frame: {LastFrameTime}ms ({Math.Round(1000.0f / LastFrameTime, 2)}fps)\nwith sync: {LastFrameTimeSync}ms ({Math.Round(1000.0f / LastFrameTimeSync, 2)}fps)";
             // drawTimeText.Text = $"frame: {Math.Round(LastFrameTimeSync, 1)}ms ({Math.Round(1000.0f / LastFrameTimeSync)}fps)";
+            #if DEBUG
             drawTimeText.Text = $"frames: {Math.Round(LastFrameTime, 1)}ms ({Math.Round(1000.0f / LastFrameTime)}fps)";
+            #endif
             //updateTimeText.Text = $"update: {LastUpdateTime}ms ({Math.Round(1000.0f / LastUpdateTime, 2)}fps)";
 
             MainSpriteManager.Draw();
