@@ -53,6 +53,7 @@ namespace osum.Graphics.Sprites
         /// Optimal storage for memory efficiency.
         /// </summary>
         private char[] textArray;
+        private string textArrayStringRepr;
 
         internal char[] TextArray
         {
@@ -107,10 +108,11 @@ namespace osum.Graphics.Sprites
                         textArray = value.ToCharArray();
                 }
 
-                textChanged = true;
+                textChanged              = true;
+                this.textArrayStringRepr = value;
             }
             get {
-                return new string(this.textArray);
+                return this.textArrayStringRepr;
             }
         }
 
@@ -288,6 +290,8 @@ namespace osum.Graphics.Sprites
         {
             textChanged = false;
             updateDrawCache = true;
+
+            //this.textArrayStringRepr = new string(this.textArray);
 
             renderTextures.Clear();
             renderCoordinates.Clear();
