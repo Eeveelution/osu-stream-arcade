@@ -138,6 +138,9 @@ namespace osum.Helpers
 
         /// <summary> Writes an arbitrary object to the buffer.  Useful where we have something of type "object"
         /// and don't know how to treat it.  This works out the best method to use to write to the buffer. </summary>
+        #if NET8_0
+        [Obsolete("Obsolete")]
+        #endif
         public void WriteObject(object obj)
         {
             if (obj == null)

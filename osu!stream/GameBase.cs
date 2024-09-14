@@ -586,7 +586,8 @@ namespace osum
             Director.Draw();
 
             //drawTimeText.Text = $"frame: {LastFrameTime}ms ({Math.Round(1000.0f / LastFrameTime, 2)}fps)\nwith sync: {LastFrameTimeSync}ms ({Math.Round(1000.0f / LastFrameTimeSync, 2)}fps)";
-            drawTimeText.Text = $"frame: {Math.Round(LastFrameTimeSync, 1)}ms ({Math.Round(1000.0f / LastFrameTimeSync)}fps)";
+            // drawTimeText.Text = $"frame: {Math.Round(LastFrameTimeSync, 1)}ms ({Math.Round(1000.0f / LastFrameTimeSync)}fps)";
+            drawTimeText.Text = $"frames: {Math.Round(LastFrameTime, 1)}ms ({Math.Round(1000.0f / LastFrameTime)}fps)";
             //updateTimeText.Text = $"update: {LastUpdateTime}ms ({Math.Round(1000.0f / LastUpdateTime, 2)}fps)";
 
             MainSpriteManager.Draw();

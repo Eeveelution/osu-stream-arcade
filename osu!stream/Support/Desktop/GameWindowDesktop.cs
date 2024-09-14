@@ -19,14 +19,15 @@ namespace osum.Support.Desktop
 {
     public class GameWindowDesktop : GameWindow {
         public static GameWindowDesktop Instance;
+        private Stopwatch _frameTime = Stopwatch.StartNew();
 
         /// <summary>Creates a 1280x720 window with the specified title.</summary>
         public GameWindowDesktop()
             : base(1280, 720, GraphicsMode.Default, "osu!stream")
         {
-            VSync    = VSyncMode.On;
+            VSync    = VSyncMode.Off;
 
-            //WindowState = WindowState.Fullscreen;
+            WindowState = WindowState.Fullscreen;
 
             Instance = this;
             //GameBase.WindowSize = new Size(960,640);
@@ -50,7 +51,7 @@ namespace osum.Support.Desktop
             KeyPress += GameWindowDesktop_KeyPress;
         }
 
-        private void GameWindowDesktop_KeyPress(object sender, KeyPressEventArgs e)
+        private void GameWindowDesktop_KeyPress(object sender, OpenTK.KeyPressEventArgs e)
         {
             switch (e.KeyChar)
             {
@@ -213,7 +214,8 @@ namespace osum.Support.Desktop
         protected override void OnRenderFrame(FrameEventArgs e)
         {
 #if DEBUG
-            Stopwatch frameTime = Stopwatch.StartNew();
+            _frameTime.Reset();
+            _frameTime.Start();
 #endif
             base.OnRenderFrame(e);
 
@@ -221,13 +223,13 @@ namespace osum.Support.Desktop
 #if DEBUG
 
 
-            GameBase.LastFrameTime = ((double)frameTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
+            _frameTime.Stop();
+            GameBase.LastFrameTime = ((double)_frameTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
 #endif
             // display
             SwapBuffers();
 
-            frameTime.Stop();
-            GameBase.LastFrameTimeSync = ((double)frameTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
+            //GameBase.LastFrameTimeSync = ((double)frameTime.ElapsedTicks / (double)Stopwatch.Frequency) * 1000.0f;
 
         }
     }

@@ -10,8 +10,21 @@ using osum.Helpers;
 
 namespace osum.Graphics.Renderers
 {
-    internal class NativeTextRendererDesktop : NativeTextRenderer
-    {
+    internal class NativeTextRendererDesktop : NativeTextRenderer {
+        private FontFamily _fontBold, _fontNormal;
+
+        public NativeTextRendererDesktop() {
+            PrivateFontCollection boldFontCollection = new PrivateFontCollection();
+            boldFontCollection.AddFontFile(Path.GetFullPath("Skins/Default/Futura-CondensedExtraBold.ttf"));
+
+            this._fontBold = boldFontCollection.Families[0];
+
+            PrivateFontCollection normalFontCollection = new PrivateFontCollection();
+            normalFontCollection.AddFontFile(Path.GetFullPath("Skins/Default/Futura-Medium.ttf"));
+
+            this._fontNormal = normalFontCollection.Families[0];
+        }
+
         internal override pTexture CreateText(string text, float size, Vector2 restrictBounds, Color4 Color4, bool shadow,
             bool bold, bool underline, TextAlignment alignment, bool forceAa,
             out Vector2 measured,
@@ -58,11 +71,7 @@ namespace osum.Graphics.Renderers
                             break;
                     }
 
-                    PrivateFontCollection fontCollection = new PrivateFontCollection();
-                    fontCollection.AddFontFile(Path.GetFullPath(bold ? @"Skins/Default/Futura-CondensedExtraBold.ttf" : @"Skins/Default/Futura-Medium.ttf"));
-                    FontFamily tFont = fontCollection.Families[0];
-
-                    using (Font f = new Font(tFont, size, fs))
+                    using (Font f = new Font(bold ? this._fontBold : this._fontNormal, size, fs))
                     {
                         {
                             try

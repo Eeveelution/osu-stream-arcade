@@ -20,14 +20,23 @@ namespace osum {
 
         private static Notification _thanksForPlayingNotification;
 
+        private static long   _lastRemainingSeconds = 0;
+        private static string _lastRemainingText    = "";
+
         public static string GetFormattedRemainingTime() {
             long remainingSeconds = (long)( (double)(CreditLength - CreditCounter.ElapsedMilliseconds) / 1000.0f);
+
+            if (_lastRemainingSeconds == remainingSeconds) {
+                return _lastRemainingText;
+            }
+
+            _lastRemainingSeconds = remainingSeconds;
 
             double minutes = Math.Max(Math.Floor((double) remainingSeconds / 60.0f), 0);
 
             remainingSeconds -= (long) (minutes * 60.0f);
 
-            return $"{(int) minutes}.{(int)Math.Max(remainingSeconds, 0):00}";
+            return _lastRemainingText = $"{(int) minutes}.{(int)Math.Max(remainingSeconds, 0):00}";
         }
 
         public static void StartCredit() {

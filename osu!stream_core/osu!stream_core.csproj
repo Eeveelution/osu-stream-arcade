@@ -1,0 +1,215 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UseWindowsForms>true</UseWindowsForms>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DefineConstants>TRACE;OSUM;MONO</DefineConstants>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <PlatformTarget>x86</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DefineConstants>TRACE;OSUM;MONO</DefineConstants>
+      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+      <PlatformTarget>x86</PlatformTarget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="..\osu!stream\ArcadeUserData.cs" />
+        <Compile Include="..\osu!stream\AssetManager\NativeAssetManager.cs" />
+        <Compile Include="..\osu!stream\Audio\AudioEngine.cs" />
+        <Compile Include="..\osu!stream\Audio\BackgroundAudioPlayerDesktop.cs" />
+        <Compile Include="..\osu!stream\Audio\ISoundEffectPlayer.cs" />
+        <Compile Include="..\osu!stream\Audio\IBackgroundAudioPlayer.cs" />
+        <Compile Include="..\osu!stream\Audio\SoundEffectPlayerBassDesktop.cs" />
+        <Compile Include="..\osu!stream\Audio\SoundEffectPlayerOpenAL.cs" />
+        <Compile Include="..\osu!stream\Director.cs" />
+        <Compile Include="..\osu!stream\GameBase.cs" />
+        <Compile Include="..\osu!stream\GameBase_ArcadeAuth.cs" />
+        <Compile Include="..\osu!stream\GameBase_CardReader.cs" />
+        <Compile Include="..\osu!stream\GameModes\Empty.cs" />
+        <Compile Include="..\osu!stream\GameModes\GameComponent.cs" />
+        <Compile Include="..\osu!stream\GameModes\GameMode.cs" />
+        <Compile Include="..\osu!stream\GameModes\MainMenu\MainMenu.cs" />
+        <Compile Include="..\osu!stream\GameModes\MainMenu\MainMenu_BeatMatching.cs" />
+        <Compile Include="..\osu!stream\GameModes\MainMenu\MenuBackground.cs" />
+        <Compile Include="..\osu!stream\GameModes\MainMenu\NewsButton.cs" />
+        <Compile Include="..\osu!stream\GameModes\Options\Credits.cs" />
+        <Compile Include="..\osu!stream\GameModes\Options\Options.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\ComboCounter.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\Countdown.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\GuideFinger.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\PauseMenu.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\PlayfieldBackground.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\ProgressDisplay.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\ScoreDisplay.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\StreamSwitchDisplay.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\PlayCombinate.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Player.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\PlayTest.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\PreviewPlayer.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Rulesets\Ruleset.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Tutorial.cs" />
+        <Compile Include="..\osu!stream\GameModes\PositioningTest.cs" />
+        <Compile Include="..\osu!stream\GameModes\Results\Results.cs" />
+        <Compile Include="..\osu!stream\GameModes\Results\ResultTransition.cs" />
+        <Compile Include="..\osu!stream\GameModes\SongSelect\ScorePanel.cs" />
+        <Compile Include="..\osu!stream\GameModes\SongSelect\SongSelect_Ranking.cs" />
+        <Compile Include="..\osu!stream\GameModes\SongSelect\SongSelect.cs" />
+        <Compile Include="..\osu!stream\GameModes\SongSelect\BackButton.cs" />
+        <Compile Include="..\osu!stream\GameModes\SongSelect\BeatmapPanel.cs" />
+        <Compile Include="..\osu!stream\GameModes\SongSelect\pTabController.cs" />
+        <Compile Include="..\osu!stream\GameModes\SongSelect\SongSelect_DifficultySelection.cs" />
+        <Compile Include="..\osu!stream\GameModes\SongSelect\SongSelect_SongInfo.cs" />
+        <Compile Include="..\osu!stream\GameModes\Store\PackPanel.cs" />
+        <Compile Include="..\osu!stream\GameModes\Store\StoreMode.cs" />
+        <Compile Include="..\osu!stream\GameModes\VideoPreview.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\Beatmaps\Beatmap.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\Beatmaps\BeatmapDifficultyInfo.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\Beatmaps\Beatmap_Timing.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\Beatmaps\ControlPoint.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\Events\Event.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitFactory.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjectManager.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjectManagerPreview.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjectManager_Load.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjects\HitObjectSpannable.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjects\Osu\HitCircle.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjects\Osu\HitFactoryOsu.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjects\HitObject.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjects\Osu\HoldCircle.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjects\Osu\Slider.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\HitObjects\Osu\Spinner.cs" />
+        <Compile Include="..\osu!stream\GameModes\Play\Components\HealthBar.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\Scoring\Score.cs" />
+        <Compile Include="..\osu!stream\Graphics\Drawables\CircularProgress.cs" />
+        <Compile Include="..\osu!stream\Graphics\Drawables\ApproachCircle.cs" />
+        <Compile Include="..\osu!stream\Graphics\SpriteSheetTexture.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pQuad.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pSpriteDynamic.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pSpriteWeb.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\SpriteManagerDraggable.cs" />
+        <Compile Include="..\osu!stream\Graphics\TextureManager_Load.cs" />
+        <Compile Include="..\osu!stream\Graphics\TouchBurster.cs" />
+        <Compile Include="..\osu!stream\Graphics\Primitives\Line.cs" />
+        <Compile Include="..\osu!stream\Graphics\Renderers\NativeTextRenderer.cs" />
+        <Compile Include="..\osu!stream\Graphics\Renderers\NativeTextRendererDesktop.cs" />
+        <Compile Include="..\osu!stream\Graphics\Renderers\SliderTrackRenderer.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pButton.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pDrawable.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pRectangle.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pDrawable_Interaction.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pText.cs" />
+        <Compile Include="..\osu!stream\Graphics\TextureManager.cs" />
+        <Compile Include="..\osu!stream\Helpers\Audio\AudioReader.cs" />
+        <Compile Include="..\osu!stream\Helpers\Audio\AudioReaderException.cs" />
+        <Compile Include="..\osu!stream\Helpers\Audio\Sound.cs" />
+        <Compile Include="..\osu!stream\Helpers\Audio\SoundData.cs" />
+        <Compile Include="..\osu!stream\Helpers\Audio\SoundFormat.cs" />
+        <Compile Include="..\osu!stream\Helpers\Audio\WaveReader.cs" />
+        <Compile Include="..\osu!stream\Helpers\ColourHelper.cs" />
+        <Compile Include="..\osu!stream\Helpers\ListHelper.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\Aes.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\AesManaged.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\bSerializable.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\CryptoHelper.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\DynamicDeserializer.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\FastEncryptionProvider.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\FastEncryptorStream.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\FastRandom.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\FastSerializer.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\GeneralHelper.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\MapPackage.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\MapStream.cs" />
+        <Compile Include="..\osu!stream\Helpers\osu!common\Scheduler.cs" />
+        <Compile Include="..\osu!stream\Helpers\pConfigManager.cs" />
+        <Compile Include="..\osu!stream\Helpers\pList.cs" />
+        <Compile Include="..\osu!stream\Helpers\pMathHelper.cs" />
+        <Compile Include="..\osu!stream\Helpers\UnixTimestamp.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\InputSourceBaanto.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\InputSource.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\InputSourceMouse.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\InputSourceRawBase.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\InputSourceRaw.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\UsbHID\Interface.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\UsbHID\USB\HidDeclarations.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\UsbHID\USB\HIDUSBDevice.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\UsbHID\USB\ListWithEvent.cs" />
+        <Compile Include="..\osu!stream\Input\Sources\UsbHID\USB\USBSharp.cs" />
+        <Compile Include="..\osu!stream\Input\TrackingPoint.cs" />
+        <Compile Include="..\osu!stream\Libraries\NetLib\DataNetRequest.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Include="..\osu!stream\Libraries\NetLib\FileNetRequest.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Include="..\osu!stream\Libraries\NetLib\NetManager.cs" />
+        <Compile Include="..\osu!stream\Libraries\NetLib\NetRequest.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Include="..\osu!stream\Libraries\NetLib\StringNetRequest.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Include="..\osu!stream\Localisation\LocalisationManager.cs" />
+        <Compile Include="..\osu!stream\Main.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\BeatmapDatabase.cs" />
+        <Compile Include="..\osu!stream\GameplayElements\DifficultyManager.cs" />
+        <Compile Include="..\osu!stream\Helpers\Clock.cs" />
+        <Compile Include="..\osu!stream\Helpers\Delegates.cs" />
+        <Compile Include="..\osu!stream\Graphics\pTexture.cs" />
+        <Compile Include="..\osu!stream\Graphics\TextureGl.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\SpriteManager.cs" />
+        <Compile Include="..\osu!stream\Support\Benchmarker.cs" />
+        <Compile Include="..\osu!stream\Support\CrashHandler.cs" />
+        <Compile Include="..\osu!stream\Support\FadeTransition.cs" />
+        <Compile Include="..\osu!stream\Support\DebugOverlay.cs" />
+        <Compile Include="..\osu!stream\Support\IDrawable.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pAnimation.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pSprite.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pSpriteCollection.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\pSpriteText.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\SpriteEffect.cs" />
+        <Compile Include="..\osu!stream\Graphics\Sprites\Transform.cs" />
+        <Compile Include="..\osu!stream\Input\InputManager.cs" />
+        <Compile Include="..\osu!stream\Constants.cs" />
+        <Compile Include="..\osu!stream\Support\Desktop\GameBaseDesktop.cs" />
+        <Compile Include="..\osu!stream\Support\Desktop\GameWindowDesktop.cs" />
+        <Compile Include="..\osu!stream\Support\ITimeSource.cs" />
+        <Compile Include="..\osu!stream\Support\IUpdateable.cs" />
+        <Compile Include="..\osu!stream\Support\Transition.cs" />
+        <Compile Include="..\osu!stream\UI\Notification.cs" />
+        <Compile Include="..\osu!stream\UI\Notification_PinEntry.cs" />
+        <Compile Include="..\osu!stream\UI\SliderControl.cs" />
+        <Compile Include="..\osu!stream\UI\TextInputNotification.cs" />
+        <Compile Include="..\osu!stream\UI\Notification_TextInput.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="..\osu!stream\bass.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\osu!stream\bass_aac.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.IO.Ports" Version="9.0.0-rc.1.24431.7" />
+      <PackageReference Include="System.Security.Permissions" Version="9.0.0-rc.1.24431.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Bass.Net">
+        <HintPath>..\osu!stream\Bass.Net.dll</HintPath>
+      </Reference>
+      <Reference Include="OpenTK">
+        <HintPath>..\osu!stream\OpenTK.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+</Project>

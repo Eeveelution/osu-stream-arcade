@@ -8,6 +8,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace osum.Helpers
 {
+    #if NET8_0
+    [Obsolete("Obsolete")]
+    #endif
     public class DynamicDeserializer
     {
         private static VersionConfigToNamespaceAssemblyObjectBinder versionBinder;

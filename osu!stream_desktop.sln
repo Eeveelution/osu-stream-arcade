@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalisationUpdater", "Loca
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StreamTester", "StreamTester\StreamTester.csproj", "{CF0E84BC-44E3-440D-9815-D5E8A3785AE9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu!stream_core", "osu!stream_core\osu!stream_core.csproj", "{3B6F6D84-E3C3-48F2-8003-569841DA991D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -59,6 +61,14 @@ Global
 		{CF0E84BC-44E3-440D-9815-D5E8A3785AE9}.ReleaseLocal|x86.Build.0 = Release|x86
 		{CF0E84BC-44E3-440D-9815-D5E8A3785AE9}.ReleaseNoEncryption|x86.ActiveCfg = Release|x86
 		{CF0E84BC-44E3-440D-9815-D5E8A3785AE9}.ReleaseNoEncryption|x86.Build.0 = Release|x86
+		{3B6F6D84-E3C3-48F2-8003-569841DA991D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B6F6D84-E3C3-48F2-8003-569841DA991D}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B6F6D84-E3C3-48F2-8003-569841DA991D}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B6F6D84-E3C3-48F2-8003-569841DA991D}.Release|x86.Build.0 = Release|Any CPU
+		{3B6F6D84-E3C3-48F2-8003-569841DA991D}.ReleaseLocal|x86.ActiveCfg = Debug|Any CPU
+		{3B6F6D84-E3C3-48F2-8003-569841DA991D}.ReleaseLocal|x86.Build.0 = Debug|Any CPU
+		{3B6F6D84-E3C3-48F2-8003-569841DA991D}.ReleaseNoEncryption|x86.ActiveCfg = Debug|Any CPU
+		{3B6F6D84-E3C3-48F2-8003-569841DA991D}.ReleaseNoEncryption|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
