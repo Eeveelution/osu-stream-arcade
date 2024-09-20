@@ -10,6 +10,7 @@ using osum.Graphics.Primitives;
 using osum.Graphics.Sprites;
 using osum.Helpers;
 using osum.Input;
+using osum.Support.Desktop;
 using Color = OpenTK.Graphics.Color4;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES11;
@@ -792,12 +793,16 @@ namespace osum.GameplayElements.HitObjects.Osu
         protected virtual void playTick()
         {
             AudioEngine.PlaySample(OsuSamples.SliderTick, SampleSet.SampleSet, SampleSet.Volume);
+
+            LightingManager.Instance?.Add(new Color4(50, 50, 50, 100), isReversing ? -5 : 5);
         }
 
         protected virtual void playRebound()
         {
             PlaySound(SoundTypeList?[lastJudgedEndpoint] ?? SoundType,
                 SampleSets?[lastJudgedEndpoint] ?? SampleSet);
+
+            LightingManager.Instance?.Add(new Color4(80, 80, 80, 100), isReversing ? -5 : 5);
         }
 
         internal override void StopSound(bool done = true)
@@ -839,6 +844,8 @@ namespace osum.GameplayElements.HitObjects.Osu
             source = AudioEngine.Effect.LoadBuffer(AudioEngine.LoadSample(OsuSamples.SliderSlide, s.SampleSet.SampleSet), s.SampleSet.Volume * 0.8f, true, true);
 
             if (source == null) return;
+
+            LightingManager.Instance?.Add(new Color4(50, 50, 50, 100), 5);
 
             source.TagNumeric++;
             source.Play();

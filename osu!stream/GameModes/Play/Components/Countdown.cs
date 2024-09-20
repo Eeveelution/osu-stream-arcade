@@ -5,6 +5,7 @@ using osum.Audio;
 using osum.Graphics;
 using osum.Graphics.Sprites;
 using osum.Helpers;
+using osum.Support.Desktop;
 
 namespace osum.GameModes.Play.Components
 {
@@ -66,18 +67,22 @@ namespace osum.GameModes.Play.Components
                     spriteManager.FadeOut(400);
                     AudioEngine.PlaySample(OsuSamples.countgo);
                     HasFinished = true;
+
                     break;
                 case 1:
                     text.Texture = TextureManager.Load(OsuTexture.countdown_1);
                     AudioEngine.PlaySample(OsuSamples.count1);
+                    LightingManager.Instance?.Blind(new Color4(0, 30, 40, 255));
                     break;
                 case 2:
                     text.Texture = TextureManager.Load(OsuTexture.countdown_2);
                     AudioEngine.PlaySample(OsuSamples.count2);
+                    LightingManager.Instance?.Blind(new Color4(0, 20, 20, 255));
                     break;
                 case 3:
                     text.Texture = TextureManager.Load(OsuTexture.countdown_3);
                     AudioEngine.PlaySample(OsuSamples.count3);
+                    LightingManager.Instance?.Blind(new Color4(0, 10, 10, 255));
                     break;
                 case 4:
                 case 5:
@@ -86,6 +91,7 @@ namespace osum.GameModes.Play.Components
                     text.Texture = TextureManager.Load(OsuTexture.countdown_ready);
                     if (spriteManager.Alpha == 0) spriteManager.FadeIn(200);
                     didChangeTexture = countdown == 7;
+                    LightingManager.Instance?.Blind(new Color4(0, 20, 20, 255));
                     break;
                 default:
                     return;

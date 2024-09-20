@@ -22,6 +22,7 @@ using osum.Helpers;
 using osum.Input;
 using osum.Input.Sources;
 using osum.Support;
+using osum.Support.Desktop;
 
 //using osu.Graphics.Renderers;
 
@@ -123,6 +124,8 @@ namespace osum.GameModes.Play
 #if HP_TESTING
             File.WriteAllText(healthTestFilename, "");
 #endif
+
+            LightingManager.Instance?.UseVolume(false);
 
             InputManager.OnDown += InputManager_OnDown;
 
@@ -322,6 +325,8 @@ namespace osum.GameModes.Play
             if (Beatmap == null)
                 return;
 
+            LightingManager.Instance?.UseVolume(true);
+
             HitObjectManager?.Dispose();
 
             if (Beatmap.Package != null && (GameBase.Instance != null && Beatmap.Package.GetMetadata(MapMetaType.Revision) == "preview"))
@@ -504,6 +509,8 @@ namespace osum.GameModes.Play
             if (Failed) return;
 
             playfieldBackground.FlashColour(Color4.Red, 500).Offset(-250);
+
+            LightingManager.Instance?.Blind(Color4.DarkRed);
 
             if (harsh)
             {

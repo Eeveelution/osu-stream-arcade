@@ -8,6 +8,7 @@ using osum.Graphics.Drawables;
 using osum.Graphics.Sprites;
 using osum.Helpers;
 using osum.Input;
+using osum.Support.Desktop;
 
 namespace osum.GameplayElements.HitObjects.Osu
 {
@@ -188,7 +189,8 @@ namespace osum.GameplayElements.HitObjects.Osu
         private TrackingPoint cursorTrackingPoint;
         private Vector2 cursorTrackingPosition;
 
-        private int lastScoreCheckTime;
+        private float nextFlash;
+        private int   lastScoreCheckTime;
 
         internal override ScoreChange CheckScoring()
         {
@@ -264,6 +266,12 @@ namespace osum.GameplayElements.HitObjects.Osu
                 double delta = velocityCurrent * elapsed;
 
                 spriteCircle.Rotation += (float)delta;
+
+                if (Math.Abs(spriteCircle.Rotation) > nextFlash)
+                {
+                    LightingManager.Instance.Add(new Color4(60, 60, 60, 100), delta > 0 ? 12 : -12);
+                    nextFlash = Math.Abs(spriteCircle.Rotation) + 0.3f;
+                }
 
                 currentRotationCount += Math.Abs(delta) * sensitivity_modifier / (MathHelper.Pi * 2);
             }

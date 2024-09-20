@@ -180,6 +180,7 @@
         <Compile Include="..\osu!stream\Constants.cs" />
         <Compile Include="..\osu!stream\Support\Desktop\GameBaseDesktop.cs" />
         <Compile Include="..\osu!stream\Support\Desktop\GameWindowDesktop.cs" />
+        <Compile Include="..\osu!stream\Support\Desktop\LightingManager.cs" />
         <Compile Include="..\osu!stream\Support\ITimeSource.cs" />
         <Compile Include="..\osu!stream\Support\IUpdateable.cs" />
         <Compile Include="..\osu!stream\Support\Transition.cs" />

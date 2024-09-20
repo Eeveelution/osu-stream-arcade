@@ -10,6 +10,7 @@ using osum.Graphics.Sprites;
 using osum.Helpers;
 using osum.Input;
 using osum.Support;
+using osum.Support.Desktop;
 
 namespace osum.GameplayElements.HitObjects
 {
@@ -256,6 +257,8 @@ namespace osum.GameplayElements.HitObjects
             Sprites.Add(p);
 
             usableSpriteManager.Add(p);
+
+            LightingManager.Instance?.Add(TextureManager.LightingColours[ColourIndex], 3);
 
             const int HitFadeIn = 120;
             const int HitFadeOutDuration = 400;

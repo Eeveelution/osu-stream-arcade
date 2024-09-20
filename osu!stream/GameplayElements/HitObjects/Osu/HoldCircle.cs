@@ -9,6 +9,7 @@ using osum.Graphics.Drawables;
 using osum.Graphics.Primitives;
 using osum.Graphics.Sprites;
 using osum.Helpers;
+using osum.Support.Desktop;
 
 namespace osum.GameplayElements.HitObjects.Osu
 {
@@ -154,6 +155,8 @@ namespace osum.GameplayElements.HitObjects.Osu
             {
                 SampleSetInfo ss = SampleSets?[lastJudgedEndpoint] ?? SampleSet;
                 PlaySound(SoundTypeList?[lastJudgedEndpoint] ?? SoundType, ss);
+
+                LightingManager.Instance?.Add(new Color4(169, 38, 251, 100), 10);
             }
         }
 
@@ -196,6 +199,8 @@ namespace osum.GameplayElements.HitObjects.Osu
             inactiveOverlay.FadeOut(160);
             circularProgress.FadeIn(160);
             circularProgress.AlwaysDraw = true;
+
+            LightingManager.Instance?.Add(new Color4(169, 38, 251, 100), 10);
         }
 
         protected override void endTracking()
