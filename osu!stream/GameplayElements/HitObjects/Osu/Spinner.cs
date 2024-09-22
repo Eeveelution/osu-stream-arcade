@@ -269,7 +269,7 @@ namespace osum.GameplayElements.HitObjects.Osu
 
                 if (Math.Abs(spriteCircle.Rotation) > nextFlash)
                 {
-                    LightingManager.Instance.Add(new Color4(60, 60, 60, 100), delta > 0 ? 12 : -12);
+                    LightingManager.Instance?.Add(new Color4(60, 60, 60, 100), delta > 0 ? 12 : -12);
                     nextFlash = Math.Abs(spriteCircle.Rotation) + 0.3f;
                 }
 

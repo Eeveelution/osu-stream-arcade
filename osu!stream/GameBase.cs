@@ -422,11 +422,12 @@ namespace osum
             MainSpriteManager.Add(this.drawTimeText);
             //MainSpriteManager.Add(this.updateTimeText);
 
+            if (ArcadeUserData.CreditType == CreditType.Time) {
+                creditTimeText            = new pSpriteText("00.00", "default", -2, FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(10, 10), 0.9f, true, Color4.White);
+                this.creditTimeText.Alpha = 0;
 
-            creditTimeText            = new pSpriteText("00.00", "default", -2, FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(10, 10), 0.9f, true, Color4.White);
-            this.creditTimeText.Alpha = 0;
-
-            MainSpriteManager.Add(this.creditTimeText);
+                MainSpriteManager.Add(this.creditTimeText);
+            }
 
             string setSerialPort = Config.GetValue("CardReaderPort", "COM5");
 
@@ -541,9 +542,9 @@ namespace osum
                 this._oldAuthState = ArcadeUserData.HasAuth;
 
                 if (ArcadeUserData.HasAuth) {
-                    Instance.creditTimeText.FadeInFromZero(1500);
+                    Instance.creditTimeText?.FadeInFromZero(1500);
                 } else {
-                    Instance.creditTimeText.FadeOut(1500);
+                    Instance.creditTimeText?.FadeOut(1500);
                 }
             }
 
@@ -573,10 +574,12 @@ namespace osum
 
             ActiveNotification?.Update();
 
-            string newCreditTime = ArcadeUserData.GetFormattedRemainingTime();
+            if (ArcadeUserData.CreditType == CreditType.Time) {
+                string newCreditTime = ArcadeUserData.GetFormattedRemainingTime();
 
-            if (creditTimeText.Text != newCreditTime) {
-                creditTimeText.Text = newCreditTime;
+                if (creditTimeText.Text != newCreditTime) {
+                    creditTimeText.Text = newCreditTime;
+                }
             }
 
             return true;

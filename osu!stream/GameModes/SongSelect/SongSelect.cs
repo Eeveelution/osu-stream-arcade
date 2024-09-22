@@ -354,8 +354,6 @@ namespace osum.GameModes.SongSelect
                     float change = (InputManager.PrimaryTrackingPoint.WindowDelta.Y) * 2;
                     float bound = offsetBound;
 
-                    Console.WriteLine(change);
-
                     if ((songSelectOffset - bound < 0 && change < 0) || (songSelectOffset - bound > 0 && change > 0))
                         change *= Math.Min(1, 10 / Math.Max(0.1f, Math.Abs(songSelectOffset - bound)));
                     songSelectOffset = songSelectOffset + change;

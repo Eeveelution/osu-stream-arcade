@@ -251,15 +251,25 @@ namespace osum.GameModes.MainMenu
                 Director.ChangeMode(OsuMode.SongSelect);
 
                 if (!ArcadeUserData.CreditStarted()) {
+                    ArcadeUserData.StartCredit();
+
                     if (ArcadeUserData.IsGuest) {
+                        string text = "Playing as Guest!\n";
+
+                        if (ArcadeUserData.CreditType == CreditType.Time) {
+                            text += "\nCredit Timer started!";
+                        }
+
                         GameBase.Notify(new Notification(
-                            "Credit Started",
-                            "Playing as Guest!\n\nCredit Timer started!",
+                            "Credit Started!",
+                            text,
                             NotificationStyle.Brief
                         ));
-                    }
 
-                    ArcadeUserData.StartCredit();
+                        if (ArcadeUserData.CreditType == CreditType.SongCount) {
+                            ArcadeUserData.DoSongCountNotification();
+                        }
+                    }
                 }
             }
             else if (sender == blue)

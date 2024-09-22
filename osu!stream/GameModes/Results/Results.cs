@@ -322,6 +322,8 @@ namespace osum.GameModes.Results
                 layer1.Add(heading);
 
                 doSubmission();
+
+                ArcadeUserData.SongCountLeft -= 1;
             }
             else
             {
@@ -657,6 +659,10 @@ namespace osum.GameModes.Results
             }
 
             Director.ChangeMode(OsuMode.SongSelect);
+
+            if (ArcadeUserData.CreditType == CreditType.SongCount) {
+                ArcadeUserData.DoSongCountNotification();
+            }
         }
 
         public override void Dispose()

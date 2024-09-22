@@ -101,6 +101,44 @@ namespace osum {
             }
         }
 
+        public static string GetFormattedCurrentSongText() {
+            if (SongCountLeft == 1) {
+                return "Final Song!";
+            }
+
+            int num = (SongCreditCountSongs - SongCountLeft) + 1;
+
+            if (num <= 0) return $"{num} Song!";
+
+            switch(num % 100)
+            {
+                case 11:
+                case 12:
+                case 13:
+                    return $"{num}th Song!";
+            }
+
+            switch(num % 10)
+            {
+                case 1:
+                    return $"{num}st Song!";
+                case 2:
+                    return $"{num}nd Song!";
+                case 3:
+                    return $"{num}rd Song!";
+                default:
+                    return $"{num}th Song!";
+            }
+        }
+
+        public static void DoSongCountNotification() {
+            GameBase.Notify(new Notification(
+                    "",
+                    GetFormattedCurrentSongText(),
+                    NotificationStyle.Brief
+            ));
+        }
+
         /// <summary>
         /// Formats the remaining time when the Time based credit is configured
         /// </summary>
