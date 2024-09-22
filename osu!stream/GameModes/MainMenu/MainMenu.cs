@@ -572,9 +572,13 @@ namespace osum.GameModes.MainMenu
             lastStrum = strum;
         }
 
+        internal int lastExplode;
+
         private void explode(int beat, float strength = 1)
         {
             pDrawable explosion = explosions[beat];
+
+            this.lastExplode = beat;
 
             if (explosion.Alpha == 0 && !menuBackgroundNew.IsAwesome && osuLogo.ScaleScalar >= 0.6f)
             {

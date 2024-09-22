@@ -58,6 +58,14 @@ namespace osum.Graphics
             new Color4(254, 242, 0, 255)
         };
 
+        internal static Color4[] LightingColours = new[]
+        {
+            new Color4(237, 0,   67,  255),
+            new Color4(0,   192, 245, 255),
+            new Color4(255, 162, 0,   255),
+            new Color4(254, 242, 0,   255)
+        };
+
         private static readonly Dictionary<OsuTexture, SpriteSheetTexture> textureLocations = new Dictionary<OsuTexture, SpriteSheetTexture>();
 
         public static void Initialize()

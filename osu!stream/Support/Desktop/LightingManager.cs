@@ -1,5 +1,7 @@
 using osum.GameModes;
 using System;
+using System.IO.Ports;
+using OpenTK.Graphics;
 using osum.Audio;
 using osum.GameModes.MainMenu;
 
@@ -61,12 +63,11 @@ namespace osum.Support.Desktop {
             _ledCount      = ledCount;
             _intensity     = intensity;
             _diminish      = diminish;
-            this._useVolume = useVolume;
 
             _colors = new LightingColour[_ledCount];
             _buffer = new byte[_ledCount * 3];
 
-            for (int i = 0; i != _ledCount) {
+            for (int i = 0; i != _ledCount; i++) {
                 _colors[i] = new LightingColour {
                     R = 1, G = 1, B = 1,
                 };
@@ -76,7 +77,8 @@ namespace osum.Support.Desktop {
         }
 
         public override void Update() {
-            if (port == null || !port.IsOpen) {
+            Console.WriteLine("sdkhfbdsjhdf");
+            if (_port == null || !_port.IsOpen) {
                 return;
             }
 
@@ -115,11 +117,11 @@ namespace osum.Support.Desktop {
             }
 
             if (color > 1) {
-                if (color > 128) currentLight = GameBase.Random.Next(led_count);
+                if (color > 128) this._currentLight = GameBase.Random.Next(this._ledCount);
 
-                _colors[currentLight].R = (byte)(color * r);
-                _colors[currentLight].G = (byte)(color * g);
-                _colors[currentLight].B = (byte)(color * b);
+                _colors[this._currentLight].R = (byte)(color * r);
+                _colors[this._currentLight].G = (byte)(color * g);
+                _colors[this._currentLight].B = (byte)(color * b);
             }
 
             int i = 0;
@@ -149,7 +151,7 @@ namespace osum.Support.Desktop {
         }
 
         internal void Add(Color4 colour, int spacingInterval = 0) {
-            if (colours == null) {
+            if (this._colors == null) {
                 return;
             }
 
@@ -166,10 +168,10 @@ namespace osum.Support.Desktop {
                     c.AddColor4(colour);
                 }
 
-                i = (i + 1) % colours.Length;
+                i = (i + 1) % this._colors.Length;
             }
 
-            _spacingCurrent = (_spacingCurrent + _color.Length - (reverse ? -1 : 1)) % _color.Length;
+            _spacingCurrent = (_spacingCurrent + this._colors.Length - (reverse ? -1 : 1)) % this._colors.Length;
         }
 
         public void UseVolume(bool enable) {

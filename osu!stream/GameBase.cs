@@ -56,6 +56,7 @@ using osum.Input;
 using osum.Libraries.NetLib;
 using osum.Localisation;
 using osum.Support;
+using osum.Support.Desktop;
 using osum.UI;
 
 namespace osum
@@ -133,6 +134,8 @@ namespace osum
         private Thread       _cardReaderThread;
         private BinaryReader _cardReaderBinaryReader;
         public static double LastFrameTime, LastFrameTimeSync, LastUpdateTime;
+
+        public LightingManager _lightingManager;
 
         private pText updateTimeText, drawTimeText;
 
@@ -439,6 +442,8 @@ namespace osum
                 _cardReaderBinaryReader = new BinaryReader(this._cardReaderPort.BaseStream);
                 Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
             }
+
+            _lightingManager = new LightingManager(this._cardReaderPort, 30);
         }
 
         public virtual string DeviceIdentifier => "1234567890123456789012345678901234567890";
@@ -521,8 +526,15 @@ namespace osum
         /// Main update cycle
         /// </summary>
         /// <returns>true if a draw should occur</returns>
-        public bool Update()
+        public bool Update(double delta)
         {
+            this._sixtyFrameAccumulator += delta;
+
+            if (this._sixtyFrameAccumulator > ((1000.0 / 60.0) / 1000.0)) {
+                this._lightingManager.Update();
+                this._sixtyFrameAccumulator = 0;
+            }
+
             if (this._oldAuthState != ArcadeUserData.HasAuth) {
                 this._oldAuthState = ArcadeUserData.HasAuth;
 
@@ -571,11 +583,13 @@ namespace osum
         private double _deltaAccumulator;
         private int    _frameAccumulator;
 
+        public double _sixtyFrameAccumulator;
+
         /// <summary>
         /// Main draw cycle.
         /// </summary>
-        public void Draw(double delta)
-        {
+        public void Draw(double delta) {
+
             #if RELEASE
             this._deltaAccumulator += delta;
             this._frameAccumulator += 1;

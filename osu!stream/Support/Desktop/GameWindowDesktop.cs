@@ -25,7 +25,7 @@ namespace osum.Support.Desktop
         public GameWindowDesktop()
             : base(1280, 720, GraphicsMode.Default, "osu!stream")
         {
-            VSync    = VSyncMode.Off;
+            VSync    = VSyncMode.On;
 
             WindowState = WindowState.Fullscreen;
 
@@ -199,7 +199,7 @@ namespace osum.Support.Desktop
                 Director.ChangeMode(OsuMode.Tutorial);
 
             //todo: make update happen from here.
-            if (GameBase.Instance != null) GameBase.Instance.Update();
+            if (GameBase.Instance != null) GameBase.Instance.Update(e.Time);
 #if DEBUG
             updateTime.Stop();
 

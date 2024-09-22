@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using OpenTK;
+using OpenTK.Graphics;
 using osum.Audio;
 using osum.GameModes.Play;
 using osum.GameplayElements.Beatmaps;
@@ -794,7 +795,7 @@ namespace osum.GameplayElements.HitObjects.Osu
         {
             AudioEngine.PlaySample(OsuSamples.SliderTick, SampleSet.SampleSet, SampleSet.Volume);
 
-            LightingManager.Instance?.Add(new Color4(50, 50, 50, 100), isReversing ? -5 : 5);
+            LightingManager.Instance?.Add(new Color(50, 50, 50, 100), isReversing ? -5 : 5);
         }
 
         protected virtual void playRebound()
