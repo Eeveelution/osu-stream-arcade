@@ -77,7 +77,6 @@ namespace osum.Support.Desktop {
         }
 
         public override void Update() {
-            Console.WriteLine("sdkhfbdsjhdf");
             if (_port == null || !_port.IsOpen) {
                 return;
             }
