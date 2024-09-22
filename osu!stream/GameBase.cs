@@ -365,6 +365,8 @@ namespace osum
 
             WhitePixel = pTexture.FromRawBytes(new byte[]{255, 255, 255, 255}, 1, 1);
 
+            ArcadeUserData.Initialize();
+
 
 #if !RELEASE
             DebugOverlay.Update();

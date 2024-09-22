@@ -159,7 +159,7 @@ namespace osum {
                 return false;
             }
 
-            return CreditCounter.ElapsedMilliseconds >= CreditLength || (CreditType == CreditType.Time && SongCountLeft == 0);
+            return CreditCounter.ElapsedMilliseconds >= CreditLength || (CreditType == CreditType.SongCount && SongCountLeft == 0);
         }
 
         public static void ResetLogin() {
