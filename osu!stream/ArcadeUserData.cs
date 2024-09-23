@@ -53,7 +53,11 @@ namespace osum {
         /// <summary>
         /// Flag whether the credit has been started with x songs
         /// </summary>
-        public static bool       StartedSongCountCredit = false;
+        public static bool StartedSongCountCredit = false;
+        /// <summary>
+        /// Flag whether the credit has been started with freeplay
+        /// </summary>
+        public static bool StartedFreeplayCredit = false;
         /// <summary>
         /// How many more songs can the user play on this credit.
         /// </summary>
@@ -175,6 +179,9 @@ namespace osum {
                     StartedSongCountCredit = true;
                     SongCountLeft = SongCreditCountSongs;
                     break;
+                case CreditType.FreePlay:
+                    StartedFreeplayCredit = true;
+                    break;
             }
 
 
@@ -185,11 +192,7 @@ namespace osum {
         }
 
         public static bool CreditStarted() {
-            if (CreditType == CreditType.FreePlay) {
-                return true;
-            }
-
-            return CreditCounter.ElapsedMilliseconds > 0 || StartedSongCountCredit;
+            return CreditCounter.ElapsedMilliseconds > 0 || StartedSongCountCredit || StartedFreeplayCredit;
         }
 
         public static bool CreditOver() {

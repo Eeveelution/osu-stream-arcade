@@ -155,8 +155,6 @@ namespace osum
             Clock.USER_OFFSET = Config.GetValue("offset", 0);
         }
 
-        private List<char>   _cardReaderBuffer = new List<char>();
-
         internal static Vector2 BaseSizeHalf => new Vector2(BaseSizeFixedWidth.X / 2, BaseSizeFixedWidth.Y / 2);
 
         internal static Vector2 GamefieldToStandard(Vector2 vec)
