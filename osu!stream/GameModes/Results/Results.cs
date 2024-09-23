@@ -15,7 +15,6 @@ using osum.Input;
 using osum.Input.Sources;
 using osum.Libraries.NetLib;
 using osum.Localisation;
-using osum.Support.Desktop;
 using osum.UI;
 
 #if iOS

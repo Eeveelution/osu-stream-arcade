@@ -1,7 +1,6 @@
 using System;
 using osum.GameModes;
 using osum.GameModes.Play;
-using osum.Helpers;
 using osum.Input;
 using osum.Input.Sources;
 using osum.UI;

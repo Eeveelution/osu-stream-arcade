@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Threading;
-using System.Windows.Forms;
 using osum;
 using osum.GameModes;
 using osum.GameModes.Play;

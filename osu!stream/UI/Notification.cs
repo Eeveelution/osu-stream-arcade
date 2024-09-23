@@ -1,15 +1,12 @@
 ﻿using System;
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osum.Audio;
 using osum.Graphics;
 using osum.Graphics.Renderers;
 using osum.Graphics.Sprites;
 using osum.Helpers;
-using osum.Input;
 using osum.Localisation;
-using osum.Support.Desktop;
 
 namespace osum.UI
 {

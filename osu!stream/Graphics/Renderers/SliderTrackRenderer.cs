@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using OpenTK;
 using osum.Graphics.Primitives;
 using osum.Graphics.Sprites;
-using Color = OpenTK.Graphics.Color4;
 #if iOS || ANDROID
 using OpenTK.Graphics.ES11;
 #if iOS

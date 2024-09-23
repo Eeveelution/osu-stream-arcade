@@ -35,10 +35,8 @@ using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using OpenTK;
 using OpenTK.Graphics;
 using osum.AssetManager;
-using osum.Graphics.Sprites;
 using osum.Helpers;
 
 

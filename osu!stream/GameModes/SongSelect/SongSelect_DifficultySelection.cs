@@ -4,7 +4,6 @@ using OpenTK.Graphics;
 using osum.Audio;
 using osum.GameModes.Play;
 using osum.GameplayElements;
-using osum.GameplayElements.Scoring;
 using osum.Graphics;
 using osum.Graphics.Renderers;
 using osum.Graphics.Sprites;

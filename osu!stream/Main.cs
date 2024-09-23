@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using osum.Audio;
-using osum.Graphics;
 
 #if ANDROID
 using osum.Support.Android;
