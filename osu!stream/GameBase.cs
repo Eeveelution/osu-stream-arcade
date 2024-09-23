@@ -342,6 +342,7 @@ namespace osum
             InputManager.Initialize();
 
             InitializeInput();
+            InitializeInactivity();
 
             if (InputManager.RegisteredSources.Count == 0)
                 throw new Exception("No input sources registered");
@@ -551,6 +552,8 @@ namespace osum
             UpdateNotifications();
 
             Scheduler.Update();
+
+            UpdateInactivity(delta);
 
 #if !RELEASE
             DebugOverlay.Update();

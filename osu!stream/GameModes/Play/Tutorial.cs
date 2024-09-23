@@ -20,10 +20,11 @@ using osum.UI;
 
 namespace osum.GameModes.Play
 {
-    internal class Tutorial : Player
-    {
+    internal class Tutorial : Player {
+        public static bool IsDemoMode = false;
+
         private BackButton backButton;
-        private pText touchToContinueText;
+        private pText      touchToContinueText;
 
         private const int music_offset = MainMenu.MainMenu.MAIN_MENU_OFFSET;
         private const int music_beatlength = MainMenu.MainMenu.MAIN_MENU_BEAT_LENGTH;
@@ -53,6 +54,12 @@ namespace osum.GameModes.Play
 
             s_Demo = new pSprite(TextureManager.Load(OsuTexture.demo), new Vector2(0, 50)) { Alpha = 0, Field = FieldTypes.StandardSnapTopCentre, Origin = OriginTypes.Centre };
             spriteManager.Add(s_Demo);
+
+            Tutorial.IsDemoMode = true;
+
+            if (IsDemoMode) {
+                Autoplay = true;
+            }
 
             GameBase.Scheduler.Add(delegate
             {
@@ -202,6 +209,16 @@ namespace osum.GameModes.Play
             loadSegment(nextSegment);
         }
 
+        private void touchToContinueOrDemoContinue(int demoWait) {
+            if (IsDemoMode) {
+                GameBase.Scheduler.Add(delegate {
+                    this.loadNextSegment();
+                }, demoWait);
+            } else {
+                showTouchToContinue();
+            }
+        }
+
         private void loadSegment(TutorialSegments segment)
         {
             currentSegment = segment;
@@ -228,15 +245,18 @@ namespace osum.GameModes.Play
             {
                 case TutorialSegments.Introduction_1:
                     showText(LocalisationManager.GetString(OsuString.WelcomeToTheWorldOfOsu));
-                    showTouchToContinue();
+
+                    touchToContinueOrDemoContinue(5000);
                     break;
                 case TutorialSegments.Introduction_2:
                     showText(LocalisationManager.GetString(OsuString.Introduction2));
-                    showTouchToContinue();
+
+                    touchToContinueOrDemoContinue(5000);
                     break;
                 case TutorialSegments.Introduction_3:
                     showText(LocalisationManager.GetString(OsuString.Introduction3));
-                    showTouchToContinue();
+
+                    touchToContinueOrDemoContinue(5500);
                     break;
                 case TutorialSegments.GuideFingers_1:
                     if (GuideFingers == null)
@@ -248,7 +268,9 @@ namespace osum.GameModes.Play
 
                     showText(LocalisationManager.GetString(OsuString.MeetTheTwoFingerGuides), -80);
 
-                    GameBase.Scheduler.Add(delegate { showTouchToContinue(); }, 1000);
+                    GameBase.Scheduler.Add(delegate {
+                        touchToContinueOrDemoContinue(2000);
+                    }, 1000);
 
                     int elapsed = Clock.Time;
                     currentSegmentDelegate = delegate
@@ -267,7 +289,8 @@ namespace osum.GameModes.Play
                     break;
                 case TutorialSegments.Introduction_4:
                     showText(LocalisationManager.GetString(OsuString.Introduction4));
-                    showTouchToContinue();
+
+                    touchToContinueOrDemoContinue(5000);
                     break;
                 case TutorialSegments.HitCircle_1:
                     resetScore();
@@ -276,7 +299,8 @@ namespace osum.GameModes.Play
 
                     playfieldBackground.ChangeColour(PlayfieldBackground.COLOUR_INTRO, false);
                     showText(LocalisationManager.GetString(OsuString.HitCircle1));
-                    showTouchToContinue();
+
+                    touchToContinueOrDemoContinue(3000);
                     break;
                 case TutorialSegments.HitCircle_2:
                 {
@@ -298,7 +322,7 @@ namespace osum.GameModes.Play
                     HitObjectManager.PostProcessing();
                     HitObjectManager.SetActiveStream(Difficulty.Easy);
 
-                    showTouchToContinue();
+                    touchToContinueOrDemoContinue(3000);
                 }
                     break;
                 case TutorialSegments.HitCircle_3:
@@ -308,7 +332,7 @@ namespace osum.GameModes.Play
                     HitCircle c = sampleHitObject as HitCircle;
                     c.SpriteApproachCircle.Bypass = false;
 
-                    showTouchToContinue();
+                    touchToContinueOrDemoContinue(3000);
                 }
                     break;
                 case TutorialSegments.HitCircle_4:
@@ -330,7 +354,7 @@ namespace osum.GameModes.Play
                         if (Clock.ManualTime > 1300)
                         {
                             if (!touchToContinue)
-                                showTouchToContinue();
+                                touchToContinueOrDemoContinue(2000);
                         }
                     };
                 }
@@ -366,7 +390,7 @@ namespace osum.GameModes.Play
                         c.HitAnimation(ScoreChange.Hit300);
                     }, 4000);
 
-                    GameBase.Scheduler.Add(delegate { loadNextSegment(); }, 6500);
+                    GameBase.Scheduler.Add(delegate { touchToContinueOrDemoContinue(1000); }, 6500);
                 }
                     break;
                 case TutorialSegments.HitCircle_6:

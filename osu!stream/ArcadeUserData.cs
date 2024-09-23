@@ -213,6 +213,7 @@ namespace osum {
             CreditCounter          = new Stopwatch();
             StartedSongCountCredit = false;
             SongCountLeft          = SongCreditCountSongs;
+            StartedFreeplayCredit  = false;
         }
 
         public static bool CreditOverReturnCatch(VoidDelegate preQuitTask = null) {

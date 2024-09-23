@@ -33,6 +33,7 @@
         <Compile Include="..\osu!stream\GameBase.cs" />
         <Compile Include="..\osu!stream\GameBase_ArcadeAuth.cs" />
         <Compile Include="..\osu!stream\GameBase_CardReader.cs" />
+        <Compile Include="..\osu!stream\GameBase_Inactivity.cs" />
         <Compile Include="..\osu!stream\GameModes\Empty.cs" />
         <Compile Include="..\osu!stream\GameModes\GameComponent.cs" />
         <Compile Include="..\osu!stream\GameModes\GameMode.cs" />
