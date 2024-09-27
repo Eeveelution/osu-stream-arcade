@@ -25,9 +25,9 @@ namespace osum.Helpers
         public const int UNIVERSAL_OFFSET_M4A = -8;
         public const int UNIVERSAL_OFFSET_INPUT = 16;//16 * 2; //roughly four frames
 #else
-        public const int UNIVERSAL_OFFSET_MP3 = 50;
-        public const int UNIVERSAL_OFFSET_M4A = -20;
-        public const int UNIVERSAL_OFFSET_INPUT = 0; //unknown
+        public static int UniversalOffsetMp3   = 50;
+        public static int UniversalOffsetM4A   = -20;
+        public static int UniversalOffsetInput = 0;//unknown
 #endif
 
         public static int USER_OFFSET;
@@ -146,7 +146,7 @@ namespace osum.Helpers
             Time = (int)Math.Round(time * 1000);
             ModeTime = (int)Math.Round(modeTime * 1000);
 
-            int offset = AudioEngine.Music == null ? 0 : (AudioEngine.Music.LastLoaded != null && AudioEngine.Music.LastLoaded.Contains("mp3") ? UNIVERSAL_OFFSET_MP3 : UNIVERSAL_OFFSET_M4A) - USER_OFFSET;
+            int offset = AudioEngine.Music == null ? 0 : (AudioEngine.Music.LastLoaded != null && AudioEngine.Music.LastLoaded.Contains("mp3") ? UniversalOffsetMp3 : UniversalOffsetM4A) - USER_OFFSET;
 
             if (AudioTimeSource.IsElapsing)
             {
@@ -184,7 +184,7 @@ namespace osum.Helpers
             }
 
             AudioTime = (int)Math.Round(currentFrameAudioTime * 1000) + offset;
-            AudioTimeInputAdjust = AudioTime - UNIVERSAL_OFFSET_INPUT;
+            AudioTimeInputAdjust = AudioTime - UniversalOffsetInput;
         }
 
         public static ITimeSource AudioTimeSource { get; set; }

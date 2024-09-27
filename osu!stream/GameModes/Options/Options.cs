@@ -29,6 +29,9 @@ namespace osum.GameModes.Options
 
         private SliderControl soundEffectSlider;
         private SliderControl universalOffsetSlider;
+        private SliderControl inputOffsetSlider;
+        private SliderControl m4aOffsetSlider;
+        private SliderControl mp3OffsetSlider;
 
         private readonly SpriteManager topMostSpriteManager = new SpriteManager();
 
@@ -137,17 +140,33 @@ namespace osum.GameModes.Options
                 });
             smd.Add(universalOffsetSlider);
 
-            vPos += 40;
-
-            text = new pText(LocalisationManager.GetString(OsuString.UniversalOffsetDetails), 24, new Vector2(0, vPos), 1, true, Color4.LightGray) { TextShadow = true };
-            text.Field = FieldTypes.StandardSnapTopCentre;
-            text.Origin = OriginTypes.TopCentre;
+            text               = new pText(LocalisationManager.GetString(OsuString.UniversalOffsetDetails) + "\nExcept for the Input and everything else offsets\npeppys code comment says that higher numbers mean earlier\non iOS and Android input offset is 16ms\n", 24, new Vector2(0, vPos), 1, true, Color4.LightGray) { TextShadow = true };
+            text.Field         = FieldTypes.StandardSnapTopCentre;
+            text.Origin        = OriginTypes.TopCentre;
             text.TextAlignment = TextAlignment.Centre;
             text.MeasureText(); //force a measure as this is the last sprite to be added to the draggable area (need height to be precalculated)
             text.TextBounds.X = 600;
             smd.Add(text);
 
             vPos += (int)text.MeasureText().Y + 50;
+
+            this.inputOffsetSlider = new SliderControl("Input Offset", Clock.UniversalOffsetInput, new Vector2(button_x_offset - 30, vPos),
+                                                         delegate(float v) { Clock.UniversalOffsetInput = v; });
+            smd.Add(inputOffsetSlider);
+
+            vPos += 60;
+
+            this.m4aOffsetSlider = new SliderControl("*.m4a Audio Offset", Clock.UniversalOffsetM4A, new Vector2(button_x_offset - 30, vPos),
+                                                       delegate(float v) { Clock.UniversalOffsetM4A = v; });
+            smd.Add(m4aOffsetSlider);
+
+            vPos += 60;
+
+            this.mp3OffsetSlider = new SliderControl("*.mp3 Audio Offset", Clock.UniversalOffsetMp3, new Vector2(button_x_offset - 30, vPos),
+                                                     delegate(float v) { Clock.UniversalOffsetMp3 = v; });
+            smd.Add(mp3OffsetSlider);
+
+            vPos += 40;
 
             UpdateButtons();
 
