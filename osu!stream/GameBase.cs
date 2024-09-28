@@ -35,11 +35,13 @@ using UIKit;
 using OpenTK.Graphics.OpenGL;
 #endif
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Ports;
 using System.Threading;
+using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics;
 using osum.AssetManager;
@@ -148,6 +150,9 @@ namespace osum
             Config = new pConfigManager(Instance.PathConfig + "osum.cfg");
 
             Clock.USER_OFFSET = Config.GetValue("offset", 0);
+            Clock.UniversalOffsetInput = Config.GetValue("InputOffset", 0);
+            Clock.UniversalOffsetMp3 = Config.GetValue("MP3Offset", 50);
+            Clock.UniversalOffsetM4A = Config.GetValue("M4AOffset", -20);
         }
 
         internal static Vector2 BaseSizeHalf => new Vector2(BaseSizeFixedWidth.X / 2, BaseSizeFixedWidth.Y / 2);

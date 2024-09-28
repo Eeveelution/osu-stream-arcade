@@ -33,8 +33,6 @@ namespace osum {
         public void UpdateInactivity(double delta) {
             this._inactivity += delta;
 
-            Console.WriteLine($"Inactivity: {this._inactivity:F2}");
-
             //If you're logged in, and haven't been active for over 20 seconds, bring up the prompt
             if (this._inactivity >= 20.0 && ArcadeUserData.HasAuth && (this._inactivityPrompt == null || this._inactivityPrompt.Dismissed)) {
                 string description = (ArcadeUserData.HasAuth && !ArcadeUserData.IsGuest) ? ArcadeUserData.Username + " " : "";

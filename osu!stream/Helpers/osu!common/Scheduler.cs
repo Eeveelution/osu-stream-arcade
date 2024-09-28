@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
@@ -7,10 +8,10 @@ namespace osum.Helpers
     //marshals delegates to run from the scheduler's basethread in a threadsafe manner
     public class Scheduler
     {
-        private readonly Queue<VoidDelegate> schedulerQueue = new Queue<VoidDelegate>();
-        private readonly pList<ScheduledDelegate> timedQueue = new pList<ScheduledDelegate>(null, true);
-        private readonly int mainThreadID;
-        private readonly Stopwatch timer = new Stopwatch();
+        private readonly Queue<VoidDelegate>      schedulerQueue = new Queue<VoidDelegate>();
+        private readonly pList<ScheduledDelegate> timedQueue     = new pList<ScheduledDelegate>(null, true);
+        private readonly int                      mainThreadID;
+        private readonly Stopwatch                timer = new Stopwatch();
 
         //we assume that basethread calls the constructor
         public Scheduler()

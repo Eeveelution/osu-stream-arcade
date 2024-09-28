@@ -24,7 +24,8 @@ namespace osum.GameModes.Options
 
         private readonly SpriteManagerDraggable smd = new SpriteManagerDraggable
         {
-            Scrollbar = true
+            Scrollbar = true,
+
         };
 
         private SliderControl soundEffectSlider;
@@ -140,7 +141,9 @@ namespace osum.GameModes.Options
                 });
             smd.Add(universalOffsetSlider);
 
-            text               = new pText(LocalisationManager.GetString(OsuString.UniversalOffsetDetails) + "\nExcept for the Input and everything else offsets\npeppys code comment says that higher numbers mean earlier\non iOS and Android input offset is 16ms\n", 24, new Vector2(0, vPos), 1, true, Color4.LightGray) { TextShadow = true };
+            vPos += 50;
+
+            text               = new pText(LocalisationManager.GetString(OsuString.UniversalOffsetDetails) + "\n\nExcept for the Input and everything else offsets\npeppys code comment says that higher numbers mean earlier\non iOS and Android input offset is 16ms\n", 18, new Vector2(0, vPos), 1, true, Color4.LightGray) { TextShadow = true };
             text.Field         = FieldTypes.StandardSnapTopCentre;
             text.Origin        = OriginTypes.TopCentre;
             text.TextAlignment = TextAlignment.Centre;
@@ -148,31 +151,56 @@ namespace osum.GameModes.Options
             text.TextBounds.X = 600;
             smd.Add(text);
 
-            vPos += (int)text.MeasureText().Y + 50;
+            vPos += (int)text.MeasureText().Y - 30;
 
-            this.inputOffsetSlider = new SliderControl("Input Offset", Clock.UniversalOffsetInput, new Vector2(button_x_offset - 30, vPos),
-                                                         delegate(float v) { Clock.UniversalOffsetInput = v; });
+            const int newOffsetRanges = 64;
+
+            this.inputOffsetSlider = new SliderControl("Input Offset", (float)(Clock.UniversalOffsetInput + newOffsetRanges) / (newOffsetRanges * 2), new Vector2(button_x_offset - 30, vPos), delegate(float v) {
+                float actualValue = ((v - 0.5f) * newOffsetRanges * 2);
+                Clock.UniversalOffsetInput = (int)actualValue;
+
+                GameBase.Config.SetValue("InputOffset", actualValue);
+
+                if (inputOffsetSlider != null) //will be null on first run.
+                    inputOffsetSlider.Text.Text = Clock.UniversalOffsetInput + "ms";
+
+            });
             smd.Add(inputOffsetSlider);
 
             vPos += 60;
 
-            this.m4aOffsetSlider = new SliderControl("*.m4a Audio Offset", Clock.UniversalOffsetM4A, new Vector2(button_x_offset - 30, vPos),
-                                                       delegate(float v) { Clock.UniversalOffsetM4A = v; });
+            this.m4aOffsetSlider = new SliderControl("*.m4a Audio Offset", (float)(Clock.UniversalOffsetM4A + newOffsetRanges) / (newOffsetRanges * 2), new Vector2(button_x_offset - 30, vPos), delegate(float v) {
+                float actualValue = ((v - 0.5f) * newOffsetRanges * 2);
+                Clock.UniversalOffsetM4A = (int)actualValue;
+
+                GameBase.Config.SetValue("M4AOffset", actualValue);
+
+                if (m4aOffsetSlider != null) //will be null on first run.
+                    m4aOffsetSlider.Text.Text = Clock.UniversalOffsetM4A + "ms";
+            });
             smd.Add(m4aOffsetSlider);
 
             vPos += 60;
 
-            this.mp3OffsetSlider = new SliderControl("*.mp3 Audio Offset", Clock.UniversalOffsetMp3, new Vector2(button_x_offset - 30, vPos),
-                                                     delegate(float v) { Clock.UniversalOffsetMp3 = v; });
+            this.mp3OffsetSlider = new SliderControl("*.mp3 Audio Offset", (float)(Clock.UniversalOffsetM4A + newOffsetRanges) / (newOffsetRanges * 2), new Vector2(button_x_offset - 30, vPos), delegate(float v) {
+                float actualValue = ((v - 0.5f) * newOffsetRanges * 2);
+                Clock.UniversalOffsetMp3 = (int) actualValue;
+
+                GameBase.Config.SetValue("MP3Offset", actualValue);
+
+                if (mp3OffsetSlider != null) //will be null on first run.
+                    mp3OffsetSlider.Text.Text = Clock.UniversalOffsetMp3 + "ms";
+            });
+
             smd.Add(mp3OffsetSlider);
 
             vPos += 40;
 
             UpdateButtons();
 
-            vPos += 50;
-
+            smd.SetMaxHeight(vPos + 250);
             smd.ScrollTo(ScrollPosition);
+
         }
 
 #if iOS
