@@ -159,7 +159,7 @@ namespace osum.GameModes.Options
                 float actualValue = ((v - 0.5f) * newOffsetRanges * 2);
                 Clock.UniversalOffsetInput = (int)actualValue;
 
-                GameBase.Config.SetValue("InputOffset", actualValue);
+                GameBase.Config.SetValue("InputOffset", Clock.UniversalOffsetInput);
 
                 if (inputOffsetSlider != null) //will be null on first run.
                     inputOffsetSlider.Text.Text = Clock.UniversalOffsetInput + "ms";
@@ -173,7 +173,7 @@ namespace osum.GameModes.Options
                 float actualValue = ((v - 0.5f) * newOffsetRanges * 2);
                 Clock.UniversalOffsetM4A = (int)actualValue;
 
-                GameBase.Config.SetValue("M4AOffset", actualValue);
+                GameBase.Config.SetValue("M4AOffset", Clock.UniversalOffsetM4A);
 
                 if (m4aOffsetSlider != null) //will be null on first run.
                     m4aOffsetSlider.Text.Text = Clock.UniversalOffsetM4A + "ms";
@@ -186,7 +186,7 @@ namespace osum.GameModes.Options
                 float actualValue = ((v - 0.5f) * newOffsetRanges * 2);
                 Clock.UniversalOffsetMp3 = (int) actualValue;
 
-                GameBase.Config.SetValue("MP3Offset", actualValue);
+                GameBase.Config.SetValue("MP3Offset", Clock.UniversalOffsetMp3);
 
                 if (mp3OffsetSlider != null) //will be null on first run.
                     mp3OffsetSlider.Text.Text = Clock.UniversalOffsetMp3 + "ms";

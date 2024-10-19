@@ -27,6 +27,29 @@ namespace osum.Input.Sources
             bind(RawInputType.Mouse, handler);
             bindPointer(pointerHandler);
 
+            const string pressAndHoldAtomStr = "MicrosoftTabletPenServiceProperty";
+            ushort pressAndHoldAtomId = GlobalAddAtomA(pressAndHoldAtomStr);
+
+            if (pressAndHoldAtomId != 0) {
+                bool success = SetPropA(this.windowHandle, pressAndHoldAtomStr, (IntPtr)(
+                         TABLET_DISABLE_PRESSANDHOLD      |
+                         TABLET_DISABLE_PENTAPFEEDBACK    |
+                         TABLET_DISABLE_PENBARRELFEEDBACK |
+                         TABLET_DISABLE_FLICKS            |
+                         TABLET_DISABLE_SMOOTHSCROLLING   |
+                         TABLET_DISABLE_FLICKFALLBACKKEYS |
+                         TABLET_ENABLE_MULTITOUCHDATA
+                ));
+
+                if (!success) {
+                    Console.WriteLine($"Setting prop failed. Error code: {GetLastError()}");
+                }
+            } else {
+                Console.WriteLine("Press and Hold Atom is 0");
+            }
+
+            DeleteAtom(pressAndHoldAtomId);
+
             registeredTouch = RegisterTouchWindow(windowHandle, TWF_WANTPALM);
             bindTouch(touchHandler);
         }

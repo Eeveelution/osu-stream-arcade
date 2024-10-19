@@ -185,6 +185,18 @@ namespace osum.Input.Sources
         [DllImport("user32.dll")]
         public static extern bool RegisterTouchWindow(IntPtr hWnd, int flags);
 
+        [DllImport("kernel32.dll")]
+        public static extern ushort GlobalAddAtomA([MarshalAs(UnmanagedType.LPStr)] string lpString);
+
+        [DllImport("kernel32.dll")]
+        public static extern ushort DeleteAtom(ushort atom);
+
+        [DllImport("user32.dll")]
+        public static extern bool SetPropA(IntPtr hWnd, [MarshalAs(UnmanagedType.LPStr)] string lpString, IntPtr hData);
+
+        [DllImport("kernel32.dll")]
+        public static extern int GetLastError();
+
         /// <summary>
         /// Function to retrieve raw input data.
         /// </summary>
@@ -217,6 +229,19 @@ namespace osum.Input.Sources
         protected const int WM_TOUCH = 0x0240;
 
         protected const int TWF_WANTPALM = 0x00000002;
+
+        protected const int TABLET_DISABLE_PRESSANDHOLD        = 0x00000001;
+        protected const int TABLET_DISABLE_PENTAPFEEDBACK      = 0x00000008;
+        protected const int TABLET_DISABLE_PENBARRELFEEDBACK   = 0x00000010;
+        protected const int TABLET_DISABLE_TOUCHUIFORCEON      = 0x00000100;
+        protected const int TABLET_DISABLE_TOUCHUIFORCEOFF     = 0x00000200;
+        protected const int TABLET_DISABLE_TOUCHSWITCH         = 0x00008000;
+        protected const int TABLET_DISABLE_FLICKS              = 0x00010000;
+        protected const int TABLET_ENABLE_FLICKSONCONTEXT      = 0x00020000;
+        protected const int TABLET_ENABLE_FLICKLEARNINGMODE    = 0x00040000;
+        protected const int TABLET_DISABLE_SMOOTHSCROLLING     = 0x00080000;
+        protected const int TABLET_DISABLE_FLICKFALLBACKKEYS   = 0x00100000;
+        protected const int TABLET_ENABLE_MULTITOUCHDATA       = 0x01000000;
     }
 
     /// <summary>

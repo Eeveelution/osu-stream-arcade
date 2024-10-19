@@ -445,7 +445,23 @@ namespace osum
                 Console.WriteLine("Created Card Reader port on " + this._cardReaderPort.PortName);
             }
 
-            _lightingManager = new LightingManager(this._cardReaderPort, 30);
+            string lightingEnabled = Config.GetValue("LightingEnabled", "false");
+
+            if (lightingEnabled == "true") {
+                Console.WriteLine("Attempting to enable LEDs");
+
+                string ledCount = Config.GetValue("LightingLedCount", "160");
+
+                bool conversionSuccessful = int.TryParse(ledCount, out int ledCountInt);
+
+                if (conversionSuccessful) {
+                    _lightingManager = new LightingManager(this._cardReaderPort, ledCountInt);
+
+                    Console.WriteLine("LightingManager enabled");
+                } else {
+                    Console.WriteLine($"Error converting `{ledCount}` to a number. LEDs disabled.");
+                }
+            }
         }
 
         public virtual string DeviceIdentifier => "1234567890123456789012345678901234567890";
@@ -533,7 +549,7 @@ namespace osum
             this._sixtyFrameAccumulator += delta;
 
             if (this._sixtyFrameAccumulator > ((1000.0 / 60.0) / 1000.0)) {
-                this._lightingManager.Update();
+                this._lightingManager?.Update();
                 this._sixtyFrameAccumulator = 0;
             }
 
