@@ -322,6 +322,8 @@ namespace osum.Graphics.Sprites
             if (lastBlendDest == dst && lastBlendSrc == src)
                 return;
 
+            BatchContext.Restart();
+
             lastBlendSrc = src;
             lastBlendDest = dst;
 
@@ -345,6 +347,7 @@ namespace osum.Graphics.Sprites
 
             if (matrixOperations)
             {
+#if !NEW_RENDERER
                 GL.PushMatrix();
 
                 GL.Translate(GameBase.NativeSize.Width / 2f, GameBase.NativeSize.Height / 2f, 0);
@@ -359,6 +362,32 @@ namespace osum.Graphics.Sprites
                     Vector2 field = FieldPosition;
                     GL.Translate(field.X, field.Y, 0);
                 }
+#else
+                Matrix4 final = Matrix4.Identity;
+                Matrix4 translation = Matrix4.CreateTranslation(GameBase.NativeSize.Width / 2f, GameBase.NativeSize.Height / 2f, 0);
+                Matrix4 rotation = Matrix4.Identity;
+                Matrix4 scale = Matrix4.Identity;
+                Matrix4 offset = Matrix4.Identity;
+
+                if (this.Rotation != 0) {
+                    rotation = Matrix4.CreateRotationZ(Rotation / MathHelper.Pi * 180);
+                }
+
+                if (ScaleScalar != 1) {
+                    scale = Matrix4.Scale(Scale.X, Scale.Y, 0);
+                }
+
+                if (this.Offset.Y != 0 || this.Position != Vector2.Zero) {
+                    offset = Matrix4.CreateTranslation(this.FieldPosition.X, this.FieldPosition.Y, 0);
+                }
+
+                final *= translation;
+                final *= rotation;
+                final *= scale;
+                final *= offset;
+
+                BatchContext.TranslationMatrix = final;
+#endif
             }
 
             float tempAlpha = 0;
@@ -401,8 +430,13 @@ namespace osum.Graphics.Sprites
                 }
             }
 
-            if (matrixOperations)
+            if (matrixOperations) {
+#if !NEW_RENDERER
                 GL.PopMatrix();
+#else
+                BatchContext.TranslationMatrix = Matrix4.Identity;
+#endif
+            }
 
             //flushBatch();
 

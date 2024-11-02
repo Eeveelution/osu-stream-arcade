@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DefineConstants>TRACE;OSUM;MONO</DefineConstants>
+      <DefineConstants>TRACE;OSUM;MONO;NEW_RENDERER</DefineConstants>
       <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
       <PlatformTarget>x86</PlatformTarget>
     </PropertyGroup>
@@ -98,6 +98,7 @@
         <Compile Include="..\osu!stream\Graphics\Sprites\SpriteManagerDraggable.cs" />
         <Compile Include="..\osu!stream\Graphics\TextureManager_Load.cs" />
         <Compile Include="..\osu!stream\Graphics\TouchBurster.cs" />
+        <Compile Include="..\osu!stream\Graphics\BatchContext.cs" />
         <Compile Include="..\osu!stream\Graphics\Primitives\Line.cs" />
         <Compile Include="..\osu!stream\Graphics\Renderers\NativeTextRenderer.cs" />
         <Compile Include="..\osu!stream\Graphics\Renderers\NativeTextRendererDesktop.cs" />

@@ -130,6 +130,7 @@
     <Compile Include="GameplayElements\Scoring\Score.cs" />
     <Compile Include="Graphics\Drawables\CircularProgress.cs" />
     <Compile Include="Graphics\Drawables\ApproachCircle.cs" />
+    <Compile Include="Graphics\BatchContext.cs" />
     <Compile Include="Graphics\SpriteSheetTexture.cs" />
     <Compile Include="Graphics\Sprites\pQuad.cs" />
     <Compile Include="Graphics\Sprites\pSpriteDynamic.cs" />
