@@ -89,7 +89,7 @@ namespace osum.GameplayElements
                         return 1000;
                     case Difficulty.Expert:
                         string packId = Player.Beatmap.Package.GetMetadata(MapMetaType.PackId);
-                        if (!string.IsNullOrEmpty(packId) && packId.Contains("custom")) {
+                        if (!string.IsNullOrEmpty(packId) && packId.ToLower().Contains("custom")) {
                             return (int)DifficultyRange(Player.Beatmap.DifficultyApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
                         } else {
                             return 800;

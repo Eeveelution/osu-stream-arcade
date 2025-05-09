@@ -45,6 +45,7 @@ namespace osum.Graphics.Sprites
     public class SpriteManager : pDrawable
     {
         internal List<pDrawable> Sprites;
+        internal string          Tag;
 
         internal bool CheckSpritesAreOnScreenBeforeRendering;
 
@@ -406,6 +407,8 @@ namespace osum.Graphics.Sprites
 
                     TexturesEnabled = p.UsesTextures;
                     AlphaBlend = p.AlphaBlend || p.Alpha != 1;
+
+
 
                     if (p.Draw())
                     {

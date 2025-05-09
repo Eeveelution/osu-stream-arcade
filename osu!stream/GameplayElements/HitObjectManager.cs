@@ -325,7 +325,7 @@ namespace osum.GameplayElements
             {
                 diffObjects = new pList<HitObject> { UseBackwardsSearch = true, InsertAfterOnEqual = true };
                 StreamHitObjects[diffIndex] = diffObjects;
-                streamSpriteManagers[diffIndex] = new SpriteManager { ForwardPlayOptimisedAdd = true };
+                streamSpriteManagers[diffIndex] = new SpriteManager { ForwardPlayOptimisedAdd = true, Tag = "streamSpriteManager" };
             }
 
             diffObjects.AddInPlace(h);
