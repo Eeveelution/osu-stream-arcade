@@ -4,6 +4,34 @@ using osum.UI;
 
 namespace osum {
     public partial class GameBase {
+        private string _lastReceivedCardId, _lastReceivedCardType;
+
+        private void displayCardLoadingSpinner(bool createHidIoTimeout = false) {
+            if (!this._cardLoadingSpinnerActive) {
+                _cardLoadingSpinnerActive = true;
+
+                _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "Attempting to retrieve information about card.", NotificationStyle.Loading);
+
+                Notify(this._cardLoadingNotification);
+
+                if (createHidIoTimeout) {
+                    Scheduler.Add(() => {
+                        if (!this._loginProcessOccuring) {
+                            _cardLoadingSpinnerActive = true;
+
+                            _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "", NotificationStyle.Loading);
+
+                            Notify(this._cardLoadingNotification);
+
+                            Console.WriteLine("nosz kurwa: lastReceivedCardId: " + this._lastReceivedCardId);
+
+                            this.ArcadeStartLoginProcess(this._lastReceivedCardId, this._lastReceivedCardType, "");
+                        } else Console.WriteLine("nosz kurwa: login process occuring. aborting");
+                    }, 1000);
+                }
+            }
+        }
+
         public void CardReaderThread() {
             try {
                 while (this._cardReaderPort.IsOpen) {
@@ -16,15 +44,7 @@ namespace osum {
                     if (splitCommand.Length >= 1) {
                         switch (splitCommand[0]) {
                             case "CardSignal":
-                                if (!this._cardLoadingSpinnerActive) {
-                                    _cardLoadingSpinnerActive = true;
-
-                                    _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "Attempting to retrieve information about card.", NotificationStyle.Loading);
-
-                                    Notify(this._cardLoadingNotification);
-                                }
-
-                                //case "CardSignal"
+                                this.displayCardLoadingSpinner();
                                 break;
                             case "CardData":
                                 if (splitCommand.Length >= 3) {
@@ -38,50 +58,43 @@ namespace osum {
                                 } else {
                                     loginFailed();
                                 }
-                                //case "CardData"
                                 break;
                             default:
-                                if (!this._cardLoadingSpinnerActive) {
-                                    //Try to fallback to regular CardIO HID
-                                    string[] splitCardIO = newLine.Replace("-", "").Split('>');
+                                //Try to fallback to regular CardIO HID
+                                string[] splitCardIO = newLine.Replace("-", "").Split('>');
 
-                                    if (splitCardIO.Length == 2 && splitCardIO[1].Contains("CardIO")) {
-                                        string cardId = splitCardIO[1].Replace("CardIO", "").Replace(" ", "");
+                                if (splitCardIO.Length == 2 && splitCardIO[1].Contains("CardIO")) {
+                                    string cardId = splitCardIO[1].Replace("CardIO", "").Replace(" ", "");
 
-                                        Console.WriteLine("nosz kurwa: CardReaderThread read id: " + cardId);
+                                    Console.WriteLine("nosz kurwa: CardReaderThread read id: " + cardId);
 
-                                        string[] cardTypePart = splitCardIO[0].Split(':');
+                                    string[] cardTypePart = splitCardIO[0].Split(':');
 
-                                        if (cardTypePart.Length == 2) {
-                                            string cardType = cardTypePart[0].Replace(" ", "");
+                                    if (cardTypePart.Length == 2) {
+                                        string cardType = cardTypePart[0].Replace(" ", "");
 
-                                            switch (cardType) {
-                                                case "MIFARE":
-                                                case "FeliCa":
-                                                case "15693":
-                                                case "None":
-                                                    if (!this._loginProcessOccuring) {
-                                                        _cardLoadingSpinnerActive = true;
+                                        switch (cardType) {
+                                            case "MIFARE":
+                                            case "FeliCa":
+                                            case "15693":
+                                            case "None":
+                                                this._lastReceivedCardId   = cardId;
+                                                this._lastReceivedCardType = cardType;
 
-                                                        _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "", NotificationStyle.Loading);
+                                                if (this._lastReceivedCardId == "") {
+                                                    Console.WriteLine("FIRST RECEIVED CARDID: " + this._lastReceivedCardId);
+                                                } else {
+                                                    Console.WriteLine("OVERWRITING CARDID WITH NEW RECEIVED: " + this._lastReceivedCardId);
+                                                }
 
-                                                        Notify(this._cardLoadingNotification);
-
-                                                        Console.WriteLine("nosz kurwa: CardReaderThread before ArcadeStartLoginProcess: " + cardId);
-
-                                                        this.ArcadeStartLoginProcess(cardId, cardType, "");
-                                                    } else Console.WriteLine("nosz kurwa: login process occuring. aborting");
-                                                    break;
-                                                default:
-                                                    Console.WriteLine($"WEIRD CARD TYPE: \"{cardType}\"");
-                                                    break;
-                                            }
-
-
+                                                this.displayCardLoadingSpinner(true);
+                                                break;
+                                            default:
+                                                Console.WriteLine($"WEIRD CARD TYPE: \"{cardType}\"");
+                                                break;
                                         }
                                     }
                                 }
-                                //default:
                                 break;
                         }
                     }
