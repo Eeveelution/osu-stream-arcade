@@ -212,7 +212,9 @@ namespace osum.GameModes.Play
         private void touchToContinueOrDemoContinue(int demoWait) {
             if (IsDemoMode) {
                 GameBase.Scheduler.Add(delegate {
-                    this.loadNextSegment();
+                    if (Director.CurrentOsuMode == OsuMode.Tutorial) {
+                        this.loadNextSegment();
+                    }
                 }, demoWait);
             } else {
                 showTouchToContinue();

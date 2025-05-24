@@ -195,6 +195,20 @@ namespace osum.GameModes.Options
             smd.Add(mp3OffsetSlider);
 
             vPos += 40;
+            vPos += 40;
+
+            pButton abc = new pButton("Log in abc", new Vector2(button_x_offset, vPos), new Vector2(280, 50), Color4.SkyBlue,
+                                         delegate {
+                                             GameBase.Instance.ArcadeStartLoginProcess("abcabcabcabcabcabcabcabc", "abcabcabcabcabcabcabcabc", "abcabcabcabcabcabcabcabc");
+                                         });
+
+            smd.Add(abc);
+
+            vPos += 40;
+
+            pButton def = new pButton("Log in def", new Vector2(button_x_offset, vPos), new Vector2(280, 50), Color4.SkyBlue, delegate { GameBase.Instance.ArcadeStartLoginProcess("defdefdefdefdefdefdefdef", "defdefdefdefdefdefdefdef", "defdefdefdefdefdefdefdef"); });
+
+            smd.Add(def);
 
             UpdateButtons();
 
@@ -202,119 +216,6 @@ namespace osum.GameModes.Options
             smd.ScrollTo(ScrollPosition);
 
         }
-
-#if iOS
-        ACAccountStore accountStore;
-        private void HandleTwitterAuth(object sender, EventArgs args)
-        {
-            if (HardwareDetection.RunningiOS5OrHigher)
-            {
-                //if we are running iOS5 or later, we can use the in-built API for handling twitter authentication.
-                accountStore = new ACAccountStore();
-                accountStore.RequestAccess(accountStore.FindAccountType(ACAccountType.Twitter), retrievedAccounts);
-            }
-            else
-            {
-                HandleTwitterOAuth();
-            }
-        }
-
-        private void HandleTwitterOAuth()
-        {
-            GameBase.Instance.ShowWebView("https://osustream.com/twitter/connect.php?udid=" + GameBase.Instance.DeviceIdentifier,
-                LocalisationManager.GetString(OsuString.TwitterLink),
-                delegate(string url)
-                {
-                    if (url.StartsWith("finished://"))
-                    {
-                        string[] split = url.Replace("finished://", "").Split('/');
-
-                        GameBase.Config.SetValue<string>("username", split[0]);
-                        GameBase.Config.SetValue<string>("hash", split[1]);
-                        GameBase.Config.SetValue<string>("twitterId", split[2]);
-                        GameBase.Config.SaveConfig();
-
-                        Director.ChangeMode(Director.CurrentOsuMode);
-                        return true;
-                    }
-                    return false;
-                });
-        }
-
-        private void retrievedAccounts(bool granted, NSError error)
-        {
-            ACAccount[] accounts = accountStore.FindAccounts(accountStore.FindAccountType(ACAccountType.Twitter));
-
-            if (!granted || error != null || accounts == null || accounts.Length == 0)
-                handleManualAuth();
-            else
-                tryNextAccount();
-        }
-
-        private void handleManualAuth()
-        {
-            if (accountStore != null)
-            {
-                accountStore.Dispose();
-                accountStore = null;
-            }
-
-            Notification n = new Notification(LocalisationManager.GetString(OsuString.AccessNotGranted),
-                                              LocalisationManager.GetString(OsuString.AccessNotGrantedDetails),
-                                              NotificationStyle.YesNo,
-                                             delegate(bool resp) {
-                if (resp) HandleTwitterOAuth();
-            });
-            GameBase.Notify(n);
-        }
-
-        private void tryNextAccount(int index = 0)
-        {
-                ACAccount[] accounts = accountStore.FindAccounts(accountStore.FindAccountType(ACAccountType.Twitter));
-                ACAccount account = accounts[index];
-
-                Notification n = new Notification(
-                                    LocalisationManager.GetString(OsuString.TwitterLinkQuestion),
-                                    string.Format(LocalisationManager.GetString(OsuString.TwitterLinkQuestionDetails), account.Username),
-                                    NotificationStyle.YesNo,
-                                    delegate(bool resp) {
-                    if (!resp)
-                    {
-                        if (index == accounts.Length - 1) //exhausted our options.
-                            handleManualAuth();
-                        else
-                            tryNextAccount(index + 1);
-                        return;
-                    }
-
-                    NSDictionary properties = account.GetDictionaryOfValuesFromKeys(new NSString[]{new NSString("properties")});
-                    string twitter_id = properties.ObjectForKey(new NSString("properties")).ValueForKey(new NSString("user_id")).ToString();
-                    //works!!
-
-                    {
-                        Notification n1 = new Notification(LocalisationManager.GetString(OsuString.TwitterSuccess),
-                                                        string.Format(LocalisationManager.GetString(OsuString.TwitterSuccessDetails), account.Username),
-                                                        NotificationStyle.Okay,
-                                                        null);
-                        GameBase.Notify(n1);
-
-                        GameBase.Config.SetValue<string>("username", account.Username);
-                        GameBase.Config.SetValue<string>("hash", "ios-" + account.Identifier);
-                        GameBase.Config.SetValue<string>("twitterId", twitter_id);
-                        GameBase.Config.SaveConfig();
-
-                        Director.ChangeMode(Director.CurrentOsuMode);
-                    }
-                });
-            GameBase.Notify(n);
-        }
-
-#else
-        private void HandleTwitterAuth(object sender, EventArgs args)
-        {
-            //not available on PC builds.
-        }
-#endif
 
         private int lastEffectSound;
         private pButton buttonFingerGuides;

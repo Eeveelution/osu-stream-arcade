@@ -436,6 +436,9 @@ namespace osum
                 //this._cardReaderPort.ReadTimeout = 1000;
                 this._cardReaderPort.RtsEnable   = true;
                 this._cardReaderPort.DtrEnable   = true;
+                this._cardReaderPort.Parity = Parity.None;
+                this._cardReaderPort.StopBits = StopBits.One;
+                this._cardReaderPort.DataBits = 8;
                 this._cardReaderPort.Open();
 
                 _cardReaderThread = new Thread(CardReaderThread);
@@ -530,7 +533,7 @@ namespace osum
 
             ArcadeUserData.Username = splitDataString[1];
 
-            Notify(new Notification("Welcome!", "Authentication successful!", NotificationStyle.Brief));
+            Notify(new Notification($"Welcome {ArcadeUserData.Username}!", "Authentication successful!", NotificationStyle.Brief));
 
             ArcadeUserData.HasAuth     = true;
             ArcadeUserData.IsGuest     = false;

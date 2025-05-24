@@ -150,7 +150,7 @@ namespace osum.UI
                 {
                     pDrawable additiveButton = null;
 
-                    cancelButton = new pSprite(TextureManager.Load(OsuTexture.notification_button_no), new Vector2(140, button_height))
+                    this.cancelButton = new pSprite(TextureManager.Load(OsuTexture.notification_button_no), new Vector2(140, button_height))
                     {
                         Field = FieldTypes.StandardSnapCentre,
                         Origin = OriginTypes.Centre,
@@ -159,16 +159,16 @@ namespace osum.UI
                         DrawDepth = 0.99f,
                         HandleClickOnUp = true
                     };
-                    cancelButton.OnHover += delegate { additiveButton = cancelButton.AdditiveFlash(10000, 0.4f); };
+                    this.cancelButton.OnHover += delegate { additiveButton = this.cancelButton.AdditiveFlash(10000, 0.4f); };
 
-                    cancelButton.OnHoverLost += delegate
+                    this.cancelButton.OnHoverLost += delegate
                     {
                         additiveButton?.FadeOut(100);
                     };
 
-                    cancelButton.OnClick += delegate { this.Dismiss(false); };
+                    this.cancelButton.OnClick += delegate { this.Dismiss(false); };
 
-                    Add(cancelButton);
+                    Add(this.cancelButton);
 
                     this.noText = new pText(LocalisationManager.GetString(OsuString.No), 24, new Vector2(140, button_height), Vector2.Zero, 1, true, Color4.White, true)
                     {

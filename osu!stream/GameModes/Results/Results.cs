@@ -322,7 +322,9 @@ namespace osum.GameModes.Results
 
                 doSubmission();
 
-                ArcadeUserData.SongCountLeft -= 1;
+                if (ArcadeUserData.CreditType == CreditType.SongCount) {
+                    ArcadeUserData.SongCountLeft -= 1;
+                }
             }
             else
             {

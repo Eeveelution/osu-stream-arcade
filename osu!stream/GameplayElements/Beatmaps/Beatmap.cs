@@ -13,6 +13,8 @@ namespace osum.GameplayElements.Beatmaps
     {
         public string ContainerFilename;
 
+        public Dictionary<string, double> DifficultyApproachRates;
+
         public double DifficultyApproachRate;
         public byte DifficultyOverall;
         public byte DifficultyCircleSize;

@@ -28,6 +28,8 @@ namespace osum {
         /// <param name="cardType">Card Type as received from the Pico 2</param>
         /// <param name="cardName">Card Name as received from the Pico 2</param>
         public void ArcadeStartLoginProcess(string cardId, string cardType, string cardName) {
+            Console.WriteLine("nosz kurwa: ArcadeStartLoginProcess begin: " + cardId);
+
             _loginProcessOccuring = true;
 
             //Censoring the Card ID, Konami arcades do this too
@@ -59,12 +61,22 @@ namespace osum {
                 StringNetRequest arcadeAuth = new StringNetRequest($"http://localhost:80/stream/arcade-auth?cardId={cardId}&machineKey={machineKey}");
 
                 arcadeAuth.onFinish += (result, exception) => {
-                    if (result == "") {
+                    if (result == "" || exception != null) {
+                        Console.WriteLine("nosz kurwa: request failed");
                         loginFailed();
                         return;
                     }
 
-                    switch (result) {
+                    string[] splitResult = result.Split('\n');
+
+                    if (splitResult.Length < 1) {
+                        loginFailed();
+                        return;
+                    }
+
+                    string status = splitResult[0];
+
+                    switch (status) {
                         case "new":
                             this.RegisterNewCard(cardId, cardType, cardName);
                             return;
@@ -78,13 +90,14 @@ namespace osum {
                             this.ReportMachineDisabled();
                             return;
                         case "exists":
-                            this.LoginExistingCard(cardId);
-                            break;
-                        default:
-                            if (exception != null) {
+                            if (splitResult.Length < 2) {
                                 this.loginFailed();
+                                return;
                             }
 
+                            string username = splitResult[1];
+
+                            this.LoginExistingCard(cardId, username);
                             break;
                     }
                 };
@@ -93,17 +106,25 @@ namespace osum {
             }, 1000);
         }
 
-        private void loginFailed() {
+        private void loginFailed(bool displayNotification = true, string reason = "") {
+            if (reason != "not me") {
+                Console.WriteLine("nosz kurwa: login failed");
+            }
+
             this._cardLoadingNotification.Dismiss(false);
 
-            Notify(new Notification(
-               "Error has occured!",
-               "Login failed! Please try again later, or continue as guest!",
-               NotificationStyle.Okay
-            ));
+            if (displayNotification) {
+                Notify(new Notification(
+                   "Error has occured!",
+                   "Login failed! Please try again later, or continue as guest!",
+                   NotificationStyle.Okay
+                ));
+            }
 
             this._cardLoadingSpinnerActive = false;
             this._loginProcessOccuring     = false;
+
+            Console.WriteLine("nosz kurwa: login process no longer occuring");
         }
 
         #region Existing Card Login
@@ -168,12 +189,12 @@ namespace osum {
             NetManager.AddRequest(tokenRequest);
         }
 
-        private void LoginExistingCard(string cardId) {
+        private void LoginExistingCard(string cardId, string username) {
             _cardLoadingNotification.Dismiss(true);
 
             _pinEntryNotification = new Notification(
-                "Welcome to osu!arcade!",
-                "Please enter your Card PIN for authentication using the keypad on the side.",
+                $"Welcome back '{username}'!",
+                "Please enter your Card PIN for authentication.",
                 NotificationStyle.PinEntry
             );
 
@@ -183,7 +204,17 @@ namespace osum {
 
                 _pinEntryNotification.Dismiss(true);
 
-                doCardLoginWithValues(cardId, notification.EnteredInput);
+                if (notification.EnteredInput == "not me") {
+                    this.loginFailed(false, "not me");
+
+                    Notify(new Notification(
+                        "Sorry for the inconvenience!",
+                        "\n\nPlease try tapping your card again to restart the Login process!",
+                        NotificationStyle.Okay
+                    ));
+                } else {
+                    doCardLoginWithValues(cardId, notification.EnteredInput);
+                }
             };
 
             _pinEntryNotification.InputEntryComplete += inputEntryCompleteHandler;

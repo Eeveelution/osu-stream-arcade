@@ -1,4 +1,5 @@
 using System;
+using osum.Input;
 using osum.UI;
 
 namespace osum {
@@ -47,6 +48,8 @@ namespace osum {
                                     if (splitCardIO.Length == 2 && splitCardIO[1].Contains("CardIO")) {
                                         string cardId = splitCardIO[1].Replace("CardIO", "").Replace(" ", "");
 
+                                        Console.WriteLine("nosz kurwa: CardReaderThread read id: " + cardId);
+
                                         string[] cardTypePart = splitCardIO[0].Split(':');
 
                                         if (cardTypePart.Length == 2) {
@@ -64,8 +67,10 @@ namespace osum {
 
                                                         Notify(this._cardLoadingNotification);
 
+                                                        Console.WriteLine("nosz kurwa: CardReaderThread before ArcadeStartLoginProcess: " + cardId);
+
                                                         this.ArcadeStartLoginProcess(cardId, cardType, "");
-                                                    }
+                                                    } else Console.WriteLine("nosz kurwa: login process occuring. aborting");
                                                     break;
                                                 default:
                                                     Console.WriteLine($"WEIRD CARD TYPE: \"{cardType}\"");

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using osum.Audio;
+using osum.GameModes.Play;
 using osum.Support;
 
 namespace osum.Helpers
@@ -146,7 +147,20 @@ namespace osum.Helpers
             Time = (int)Math.Round(time * 1000);
             ModeTime = (int)Math.Round(modeTime * 1000);
 
-            int offset = AudioEngine.Music == null ? 0 : (AudioEngine.Music.LastLoaded != null && AudioEngine.Music.LastLoaded.Contains("mp3") ? UniversalOffsetMp3 : UniversalOffsetM4A) - USER_OFFSET;
+            int forcedAudioOffset = 0;
+
+            if (AudioEngine.Music?.LastLoaded != null) {
+                if (
+                    Player.Beatmap != null && Player.Beatmap.Package != null && Player.Beatmap.Package.GetMetadata(MapMetaType.PackId).ToLower().Contains("custom") ||
+                    AudioEngine.Music.LastLoaded.Contains("mp3")
+                ) {
+                    forcedAudioOffset = UniversalOffsetMp3;
+                } else if (AudioEngine.Music.LastLoaded.Contains("m4a")) {
+                    forcedAudioOffset = UniversalOffsetM4A;
+                }
+            }
+
+            int offset = AudioEngine.Music == null ? 0 : forcedAudioOffset - USER_OFFSET;
 
             if (AudioTimeSource.IsElapsing)
             {
