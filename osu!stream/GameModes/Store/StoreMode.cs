@@ -122,7 +122,7 @@ namespace osum.GameModes.Store
             if (e != null || string.IsNullOrEmpty(result))
             {
                 //error has occurred!
-                GameBase.Notify(LocalisationManager.GetString(OsuString.ErrorWhileDownloadingSongListing), delegate { Director.ChangeMode(OsuMode.SongSelect); });
+                GameBase.Notify(LocalisationManager.GetString(OsuString.ErrorWhileDownloadingSongListing), delegate { Director.ChangeMode(OsuMode.MainMenu); });
                 return;
             }
 
@@ -220,11 +220,11 @@ namespace osum.GameModes.Store
                 HasNewStoreItems = false;
 
                 if (packs.Count == 0)
-                    GameBase.Notify(LocalisationManager.GetString(OsuString.HaveAllAvailableSongPacks), delegate { Director.ChangeMode(OsuMode.SongSelect); });
+                    GameBase.Notify(LocalisationManager.GetString(OsuString.HaveAllAvailableSongPacks), delegate { Director.ChangeMode(OsuMode.MainMenu); });
             }
             catch
             {
-                GameBase.Notify(LocalisationManager.GetString(OsuString.ErrorWhileDownloadingSongListing), delegate { Director.ChangeMode(OsuMode.SongSelect); });
+                GameBase.Notify(LocalisationManager.GetString(OsuString.ErrorWhileDownloadingSongListing), delegate { Director.ChangeMode(OsuMode.MainMenu); });
             }
         }
 

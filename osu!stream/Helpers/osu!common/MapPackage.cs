@@ -1571,6 +1571,9 @@ namespace osum.Helpers
         SourceUnicode,
         ArtistUrl,
         Revision,
-        PackId
+        PackId,
+
+        ExpertCustomApproachRate,
+        UseMp3OffsetForM4A
     }
 }

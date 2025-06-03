@@ -182,7 +182,7 @@ namespace osum.GameModes.Options
 
             vPos += 60;
 
-            this.mp3OffsetSlider = new SliderControl("*.mp3 Audio Offset", (float)(Clock.UniversalOffsetM4A + newOffsetRanges) / (newOffsetRanges * 2), new Vector2(button_x_offset - 30, vPos), delegate(float v) {
+            this.mp3OffsetSlider = new SliderControl("*.mp3 Audio Offset", (float)(Clock.UniversalOffsetMp3 + newOffsetRanges) / (newOffsetRanges * 2), new Vector2(button_x_offset - 30, vPos), delegate(float v) {
                 float actualValue = ((v - 0.5f) * newOffsetRanges * 2);
                 Clock.UniversalOffsetMp3 = (int) actualValue;
 

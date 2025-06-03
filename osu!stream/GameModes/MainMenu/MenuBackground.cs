@@ -266,9 +266,7 @@ namespace osum.GameModes.MainMenu
                             NotificationStyle.Brief
                         ));
 
-                        if (ArcadeUserData.CreditType == CreditType.SongCount) {
-                            ArcadeUserData.DoSongCountNotification();
-                        }
+
                     }
                 }
             }

@@ -200,7 +200,7 @@ namespace osum {
                 return false;
             }
 
-            return CreditCounter.ElapsedMilliseconds >= CreditLength || (CreditType == CreditType.SongCount && SongCountLeft == 0);
+            return (CreditCounter.ElapsedMilliseconds >= CreditLength || (CreditType == CreditType.SongCount && SongCountLeft <= 0)) && CreditStarted();
         }
 
         public static void ResetLogin() {

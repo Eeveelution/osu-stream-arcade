@@ -150,13 +150,29 @@ namespace osum.Helpers
             int forcedAudioOffset = 0;
 
             if (AudioEngine.Music?.LastLoaded != null) {
-                if (
-                    Player.Beatmap != null && Player.Beatmap.Package != null && Player.Beatmap.Package.GetMetadata(MapMetaType.PackId).ToLower().Contains("custom") ||
-                    AudioEngine.Music.LastLoaded.Contains("mp3")
-                ) {
+                string packId = null;
+                string offsetType = null;
+
+                if (Player.Beatmap != null && Player.Beatmap.Package != null) {
+                    packId     = Player.Beatmap.Package.GetMetadata(MapMetaType.PackId);
+                    offsetType = Player.Beatmap.Package.GetMetadata(MapMetaType.UseMp3OffsetForM4A);
+                }
+
+                bool isCustomMapAndWantsMp3Offset = Player.Beatmap != null && Player.Beatmap.Package       != null && (packId != null && packId.ToLower().Contains("custom") && offsetType != null && offsetType.ToLower().Contains("true"));
+                bool currentSongIsMp3 = AudioEngine.Music          != null && AudioEngine.Music.LastLoaded != null && AudioEngine.Music.LastLoaded.Contains("mp3");
+
+                if (isCustomMapAndWantsMp3Offset && currentSongIsMp3) {
                     forcedAudioOffset = UniversalOffsetMp3;
                 } else if (AudioEngine.Music.LastLoaded.Contains("m4a")) {
                     forcedAudioOffset = UniversalOffsetM4A;
+                }
+
+                if (!isCustomMapAndWantsMp3Offset && !currentSongIsMp3) {
+                    forcedAudioOffset  = GameBase.Config.GetValue("M4AOffset", -20);
+                }
+
+                if (!isCustomMapAndWantsMp3Offset && currentSongIsMp3) {
+                    forcedAudioOffset = GameBase.Config.GetValue("MP3Offset", 50);
                 }
             }
 

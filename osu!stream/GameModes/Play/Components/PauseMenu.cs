@@ -212,7 +212,7 @@ namespace osum.GameModes.Play.Components
             pSprite s = sender as pSprite;
             s.AdditiveFlash(500, 1);
 
-            if (ArcadeUserData.CreditOver()) {
+            if (ArcadeUserData.CreditOver() || ArcadeUserData.SongCountLeft == 1) {
                 GameBase.Notify(new Notification(
                 "Time's over!",
                 "Your timer has expired! You can either play this map, or quit. Do you want to quit?", NotificationStyle.YesNo,
@@ -224,6 +224,11 @@ namespace osum.GameModes.Play.Components
             } else {
                 Player.SongSelectForceBeatmap = true;
                 Director.ChangeMode(OsuMode.SongSelect);
+            }
+
+            if (ArcadeUserData.CreditType == CreditType.SongCount) {
+                ArcadeUserData.SongCountLeft -= 1;
+                // ArcadeUserData.CreditOverReturnCatch();
             }
 
             AudioEngine.PlaySample(OsuSamples.MenuBack);
@@ -290,7 +295,7 @@ namespace osum.GameModes.Play.Components
 
         public override void Update()
         {
-            if (ArcadeUserData.CreditOver() && !this.restartRemoved) {
+            if ((ArcadeUserData.CreditOver() || ArcadeUserData.SongCountLeft == 1) && !this.restartRemoved) {
                 this.spriteManager.Sprites.Remove(this.buttonRestart);
             }
 

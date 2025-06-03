@@ -324,6 +324,7 @@ namespace osum.GameModes.Results
 
                 if (ArcadeUserData.CreditType == CreditType.SongCount) {
                     ArcadeUserData.SongCountLeft -= 1;
+                    // ArcadeUserData.CreditOverReturnCatch();
                 }
             }
             else
@@ -417,10 +418,58 @@ namespace osum.GameModes.Results
                         spriteSubmitting.Colour = Color4.Red;
                     }
 
-                    if (e == null && result != null && result.StartsWith("message:"))
+                    if (e == null && result != null)
                     {
-                        rankingNotification = new Notification("Ranking", result.Replace("message:", string.Empty), NotificationStyle.Okay);
-                        if (finishedDisplaying) GameBase.Notify(rankingNotification);
+                        if (result.StartsWith("message:")) {
+                            rankingNotification = new Notification("Ranking", result.Replace("message:", string.Empty), NotificationStyle.Okay);
+                            if (finishedDisplaying) GameBase.Notify(rankingNotification);
+                        }
+
+                        if (result.StartsWith("streams:")) {
+                            bool parsedSuccessfully = float.TryParse(result.Replace("streams:", ""), out float newStreams);
+
+                            if (parsedSuccessfully) {
+                                ArcadeUserData.StatStreams = newStreams;
+                            }
+                            // double streamDiff = newStreams - ArcadeUserData.StatStreams;
+                            //
+                            // Notification streamsUpdateNotification = new Notification("Ranking up!", "", NotificationStyle.Okay);
+                            //
+                            // pSprite userBackground;
+                            // pText   usernameText;
+                            // pText   userStatsText;
+                            // pSprite userRankBadge;
+                            //
+                            // const int baseHeight = 10;
+                            // const int baseX = 20;
+                            // // userBackground       = new pSprite(TextureManager.Load(OsuTexture.ranking_background), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(baseX + 5, baseHeight), 0.999f, true, Color4.White);
+                            // // userBackground.Scale = new Vector2(0.35f, 0.2f);
+                            // // userBackground.Alpha = 0;
+                            // //
+                            // // streamsUpdateNotification.Sprites.Add(userBackground);
+                            //
+                            // usernameText        = new pText(ArcadeUserData.Username, 24.0f, new Vector2(baseX + 8, baseHeight + 5), 1f, true, Color4.White);
+                            // usernameText.Origin = OriginTypes.TopLeft;
+                            // usernameText.Field  = FieldTypes.Standard;
+                            // usernameText.Alpha  = 0;
+                            //
+                            // streamsUpdateNotification.Sprites.Add(usernameText);
+                            //
+                            // userStatsText        = new pText($"{newStreams} streams\nmiddle-class rank", 12.0f, new Vector2(baseX + 10, baseHeight + 32), 1f, true, Color4.White);
+                            // userStatsText.Origin = OriginTypes.TopLeft;
+                            // userStatsText.Field  = FieldTypes.Standard;
+                            // userStatsText.Alpha  = 0;
+                            //
+                            // streamsUpdateNotification.Sprites.Add(userStatsText);
+                            //
+                            // userRankBadge       = new pSprite(TextureManager.Load(OsuTexture.rank_b_small), FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Mode, new Vector2(baseX + 140, baseHeight + 12), 1, true, Color4.White);
+                            // userRankBadge.Alpha = 0;
+                            //
+                            // streamsUpdateNotification.Sprites.Add(userRankBadge);
+                            //
+                            // rankingNotification = streamsUpdateNotification;
+                            // if (finishedDisplaying) GameBase.Notify(rankingNotification);
+                        }
                     }
                 };
                 NetManager.AddRequest(nr);
@@ -660,10 +709,6 @@ namespace osum.GameModes.Results
             }
 
             Director.ChangeMode(OsuMode.SongSelect);
-
-            if (ArcadeUserData.CreditType == CreditType.SongCount) {
-                ArcadeUserData.DoSongCountNotification();
-            }
         }
 
         public override void Dispose()

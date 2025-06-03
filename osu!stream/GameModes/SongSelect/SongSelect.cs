@@ -129,6 +129,10 @@ namespace osum.GameModes.SongSelect
                     pos.X += 300;
                 }
             }
+
+            if (!ArcadeUserData.CreditOver() && ArcadeUserData.CreditType == CreditType.SongCount) {
+                GameBase.Scheduler.Add(ArcadeUserData.DoSongCountNotification, 250);
+            }
         }
 
         private void onBackPressed(object sender, EventArgs args)

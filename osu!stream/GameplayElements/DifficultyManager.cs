@@ -1,4 +1,5 @@
-﻿using osum.GameModes.Play;
+﻿using System;
+using osum.GameModes.Play;
 using osum.GameModes.Play.Components;
 using osum.Helpers;
 
@@ -89,11 +90,19 @@ namespace osum.GameplayElements
                         return 1000;
                     case Difficulty.Expert:
                         string packId = Player.Beatmap.Package.GetMetadata(MapMetaType.PackId);
-                        if (!string.IsNullOrEmpty(packId) && packId.ToLower().Contains("custom")) {
-                            return (int)DifficultyRange(Player.Beatmap.DifficultyApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
-                        } else {
-                            return 800;
+                        string customApproachRate = Player.Beatmap.Package.GetMetadata(MapMetaType.ExpertCustomApproachRate);
+
+                        if (
+                            !string.IsNullOrEmpty(packId) &&
+                            !string.IsNullOrEmpty(customApproachRate) &&
+                            packId.ToLower().Contains("custom"))
+                        {
+                            double parsedApproachRate = Math.Min(10.0, Math.Max(0.0, double.Parse(customApproachRate, GameBase.nfi)));
+
+                            return (int)DifficultyRange(parsedApproachRate, PREEMPT_MAX, PREEMPT_MID, PREEMPT_MIN);
                         }
+
+                        return 800;
                 }
             }
         }

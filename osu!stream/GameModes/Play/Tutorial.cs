@@ -209,20 +209,30 @@ namespace osum.GameModes.Play
             loadSegment(nextSegment);
         }
 
+        private List<TutorialSegments> _waitingEnqueuedForSegments = new List<TutorialSegments>();
+
         private void touchToContinueOrDemoContinue(int demoWait) {
             if (IsDemoMode) {
+                if (this._waitingEnqueuedForSegments.Contains(this.currentSegment)) {
+                    return;
+                }
+
                 GameBase.Scheduler.Add(delegate {
                     if (Director.CurrentOsuMode == OsuMode.Tutorial) {
                         this.loadNextSegment();
                     }
                 }, demoWait);
+
+                System.Console.WriteLine($"Adding {demoWait}ms delay.");
+
+                this._waitingEnqueuedForSegments.Add(this.currentSegment);
             } else {
                 showTouchToContinue();
             }
         }
 
-        private void loadSegment(TutorialSegments segment)
-        {
+        private void loadSegment(TutorialSegments segment) {
+            System.Console.WriteLine("Loading Segment: " + segment.ToString());
             currentSegment = segment;
 
             nextSegment = currentSegment + 1;
@@ -396,13 +406,15 @@ namespace osum.GameModes.Play
                 }
                     break;
                 case TutorialSegments.HitCircle_6:
-                    hideDemo();
+                    if (!IsDemoMode) {
+                        hideDemo();
+                    }
                     showText(LocalisationManager.GetString(OsuString.HitCircle6));
-                    showTouchToContinue();
+                    touchToContinueOrDemoContinue(3000);
                     break;
                 case TutorialSegments.HitCircle_Interact:
                 {
-                    prepareInteract();
+                    prepareInteract(IsDemoMode);
                     HitObjectManager.OnScoreChanged += hitObjectManager_OnScoreChanged;
 
                     const int x1 = 100;
@@ -454,7 +466,7 @@ namespace osum.GameModes.Play
                         showText(LocalisationManager.GetString(OsuString.HitCircleJudge4));
                     }
 
-                    showTouchToContinue();
+                    touchToContinueOrDemoContinue(3000);
                     break;
                 case TutorialSegments.Hold_1:
                 {
@@ -490,7 +502,7 @@ namespace osum.GameModes.Play
                         }
 
                         if (Clock.ManualTime > 2700 && !touchToContinue)
-                            showTouchToContinue();
+                            touchToContinueOrDemoContinue(3000);
 
                         sampleHitObject.HitAnimation(sampleHitObject.CheckScoring());
                         sampleHitObject.Update();
@@ -498,14 +510,16 @@ namespace osum.GameModes.Play
                 }
                     break;
                 case TutorialSegments.Hold_2:
-                    hideDemo();
+                    if(!IsDemoMode)
+                    {
+                        hideDemo();
+                    }
                     showText(LocalisationManager.GetString(OsuString.Hold2));
-                    showTouchToContinue();
+                    touchToContinueOrDemoContinue(3000);
                     break;
                 case TutorialSegments.Hold_Interact:
                 {
-                    prepareInteract();
-
+                    prepareInteract(IsDemoMode);
 
                     const int x1 = 100;
                     const int x2 = 512 - 100;
@@ -591,7 +605,7 @@ namespace osum.GameModes.Play
                         if (Clock.ManualTime < 1550)
                             Clock.IncrementManual(0.5f);
                         else
-                            showTouchToContinue();
+                            touchToContinueOrDemoContinue(3000);
                     };
 
                     HitObjectManager.Add(sampleHitObject, Difficulty.Easy);
@@ -613,7 +627,7 @@ namespace osum.GameModes.Play
                         if (Clock.ManualTime < sampleHitObject.EndTime + 500)
                             Clock.IncrementManual(0.5f);
                         else
-                            showTouchToContinue();
+                            touchToContinueOrDemoContinue(3000);
 
                         sampleHitObject.HitAnimation(sampleHitObject.CheckScoring());
                         sampleHitObject.Update();
@@ -646,7 +660,7 @@ namespace osum.GameModes.Play
                             Clock.IncrementManual(0.5f);
                         else if (!touchToContinue)
                         {
-                            showTouchToContinue();
+                            touchToContinueOrDemoContinue(3000);
                             arrowAtEnd.FadeOut(50);
                             showText(LocalisationManager.GetString(OsuString.Slider3_1)).Colour = Color4.SkyBlue;
                         }
@@ -656,12 +670,15 @@ namespace osum.GameModes.Play
 
                     break;
                 case TutorialSegments.Slider_4:
-                    hideDemo();
+                    if(!IsDemoMode)
+                    {
+                        hideDemo();
+                    }
                     showText(LocalisationManager.GetString(OsuString.Slider4));
-                    showTouchToContinue();
+                    touchToContinueOrDemoContinue(3000);
                     break;
                 case TutorialSegments.Slider_Interact:
-                    prepareInteract();
+                    prepareInteract(IsDemoMode);
 
                     HitObjectManager.Add(new Slider(HitObjectManager, new Vector2(50, 92), music_offset + 160 * music_beatlength, true, 0, HitObjectSoundType.Normal, CurveTypes.Bezier, 0, 300, new List<Vector2> { new Vector2(50, 92), new Vector2(200, 70), new Vector2(350, 92) }, null, 200, 300f / 8), Difficulty.Easy);
                     HitObjectManager.Add(new Slider(HitObjectManager, new Vector2(512 - 50, 384 - 92), music_offset + 168 * music_beatlength, true, 0, HitObjectSoundType.Normal, CurveTypes.Bezier, 0, 300, new List<Vector2> { new Vector2(512 - 50, 384 - 92), new Vector2(512 - 200, 384 - 70), new Vector2(512 - 350, 384 - 92) }, null, 200, 300f / 8), Difficulty.Easy);
@@ -704,7 +721,7 @@ namespace osum.GameModes.Play
                             showText(LocalisationManager.GetString(OsuString.Perfect));
                         }
 
-                        showTouchToContinue();
+                        touchToContinueOrDemoContinue(3000);
                     }, 500);
                     break;
 
@@ -713,7 +730,7 @@ namespace osum.GameModes.Play
                     resetScore();
 
                     showText(LocalisationManager.GetString(OsuString.Spinner1));
-                    showTouchToContinue();
+                    touchToContinueOrDemoContinue(3000);
                     break;
 
                 case TutorialSegments.Spinner_2:
@@ -740,7 +757,7 @@ namespace osum.GameModes.Play
                             Clock.IncrementManual(0.5f);
                         else
                         {
-                            showTouchToContinue();
+                            touchToContinueOrDemoContinue(3000);
                         }
                     };
 
@@ -1462,14 +1479,16 @@ namespace osum.GameModes.Play
             return string.Empty;
         }
 
-        private void prepareInteract()
+        private void prepareInteract(bool keepAutoplay = false)
         {
             backButton.FadeOut(500);
 
             resetScore();
             playfieldBackground.ChangeColour(PlayfieldBackground.COLOUR_STANDARD, false);
 
-            Autoplay = false;
+            if (!keepAutoplay) {
+                Autoplay = false;
+            }
 
             Difficulty = Difficulty.Easy;
 

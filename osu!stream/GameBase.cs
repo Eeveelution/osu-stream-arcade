@@ -504,6 +504,8 @@ namespace osum
         //also creates the display on the main menu that the user is logged in
         //with all sorts of stats
         private void EstablishUser(string dataString, string submitToken) {
+            ArcadeUserData.ResetLogin();
+
             _cardLoadingSpinnerActive = false;
 
             this._cardLoadingNotification?.Dismiss(true);

@@ -14,13 +14,15 @@ namespace osum.Graphics.Renderers
         private FontFamily _fontBold, _fontNormal;
 
         public NativeTextRendererDesktop() {
+            string skinsFolder = AppDomain.CurrentDomain.BaseDirectory + "Skins/Default";
+
             PrivateFontCollection boldFontCollection = new PrivateFontCollection();
-            boldFontCollection.AddFontFile(Path.GetFullPath("Skins/Default/Futura-CondensedExtraBold.ttf"));
+            boldFontCollection.AddFontFile($"{skinsFolder}/Futura-CondensedExtraBold.ttf");
 
             this._fontBold = boldFontCollection.Families[0];
 
             PrivateFontCollection normalFontCollection = new PrivateFontCollection();
-            normalFontCollection.AddFontFile(Path.GetFullPath("Skins/Default/Futura-Medium.ttf"));
+            normalFontCollection.AddFontFile($"{skinsFolder}/Futura-Medium.ttf");
 
             this._fontNormal = normalFontCollection.Families[0];
         }

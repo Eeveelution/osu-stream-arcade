@@ -865,6 +865,14 @@ namespace osum.GameModes.Play
                                 ArcadeUserData.CreditOverReturnCatch();
                             }, 1000);
                         }
+
+                        if (ArcadeUserData.CreditType == CreditType.SongCount) {
+                            ArcadeUserData.SongCountLeft--;
+
+                            GameBase.Scheduler.Add(delegate {
+                                ArcadeUserData.CreditOverReturnCatch();
+                            }, 1000);
+                        }
                     }
                     else
                     {

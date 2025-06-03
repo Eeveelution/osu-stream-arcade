@@ -41,6 +41,17 @@ namespace osum.GameplayElements
                         if (Version > 3)
                             BeatmapInfo = reader.ReadBList<BeatmapInfo>();
                     }
+
+                    //dumping diff info
+                    // if (File.Exists("dump.txt")) {
+                    //     File.Delete("dump.txt");
+                    // }
+                    //
+                    // foreach (BeatmapInfo info in BeatmapInfo) {
+                    //     Beatmap beatmap = info.GetBeatmap();
+                    //
+                    //     File.AppendAllText("dump.txt", $"{beatmap.ContainerFilename}:{beatmap.BeatmapFilename}:{beatmap.DifficultyStars}\n");
+                    // }
                 }
                 catch (Exception e)
                 {

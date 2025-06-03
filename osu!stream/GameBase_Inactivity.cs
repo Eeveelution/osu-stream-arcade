@@ -28,10 +28,13 @@ namespace osum {
             }
 
             this._inactivityPrompt = null;
+            // this._inactivity       = 15.0f;
         }
 
         public void UpdateInactivity(double delta) {
-            this._inactivity += delta;
+            if (!Player.Autoplay) {
+                this._inactivity += delta;
+            }
 
             //If you're logged in, and haven't been active for over 20 seconds, bring up the prompt
             if (this._inactivity >= 20.0 && ArcadeUserData.HasAuth && (this._inactivityPrompt == null || this._inactivityPrompt.Dismissed)) {
@@ -70,11 +73,11 @@ namespace osum {
                 }, 10000);
             }
 
-            if (this._inactivity >= 30.0f && !ArcadeUserData.HasAuth && Director.CurrentOsuMode == OsuMode.MainMenu) {
-                Tutorial.IsDemoMode = true;
-
-                Director.ChangeMode(OsuMode.Tutorial);
-            }
+            // if (this._inactivity >= 50.0f && !ArcadeUserData.HasAuth && Director.CurrentOsuMode == OsuMode.MainMenu) {
+            //     Tutorial.IsDemoMode = true;
+            //
+            //     Director.ChangeMode(OsuMode.Tutorial);
+            // }
         }
     }
 }
