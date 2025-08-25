@@ -27,7 +27,7 @@ namespace osum.Support.Desktop
         {
             VSync    = VSyncMode.On;
 
-            //WindowState = WindowState.Fullscreen;
+            WindowState = WindowState.Fullscreen;
 
             Instance = this;
             //GameBase.WindowSize = new Size(960,640);

@@ -8,12 +8,6 @@ namespace osum {
 
         private void displayCardLoadingSpinner(bool createHidIoTimeout = false) {
             if (!this._cardLoadingSpinnerActive) {
-                _cardLoadingSpinnerActive = true;
-
-                _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "Attempting to retrieve information about card.", NotificationStyle.Loading);
-
-                Notify(this._cardLoadingNotification);
-
                 if (createHidIoTimeout) {
                     Scheduler.Add(() => {
                         if (!this._loginProcessOccuring) {
@@ -28,6 +22,12 @@ namespace osum {
                             this.ArcadeStartLoginProcess(this._lastReceivedCardId, this._lastReceivedCardType, "");
                         } else Console.WriteLine("nosz kurwa: login process occuring. aborting");
                     }, 1000);
+                } else {
+                    _cardLoadingSpinnerActive = true;
+
+                    _cardLoadingNotification = new Notification("Logging into the osu!arcade network!", "Attempting to retrieve information about card.", NotificationStyle.Loading);
+
+                    Notify(this._cardLoadingNotification);
                 }
             }
         }

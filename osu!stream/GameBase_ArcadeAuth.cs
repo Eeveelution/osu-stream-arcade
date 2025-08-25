@@ -58,7 +58,7 @@ namespace osum {
 
                 string machineKey = Config.GetValue("MachineKey", "");
 
-                StringNetRequest arcadeAuth = new StringNetRequest($"http://localhost:80/stream/arcade-auth?cardId={cardId}&machineKey={machineKey}");
+                StringNetRequest arcadeAuth = new StringNetRequest($"https://arcade.titanic.sh/stream/arcade-auth?cardId={cardId}&machineKey={machineKey}");
 
                 arcadeAuth.onFinish += (result, exception) => {
                     if (result == "" || exception != null) {
@@ -132,7 +132,7 @@ namespace osum {
         private void doCardLoginWithValues(string cardId, string cardPin, Action<bool> onComplete = null) {
             string machineKey = Config.GetValue("MachineKey", "");
 
-            StringNetRequest tokenRequest = new StringNetRequest($"http://localhost:80/stream/arcade-auth?cardId={cardId}&cardPin={cardPin}&machineKey={machineKey}");
+            StringNetRequest tokenRequest = new StringNetRequest($"https://arcade.titanic.sh/stream/arcade-auth?cardId={cardId}&cardPin={cardPin}&machineKey={machineKey}");
 
             StringNetRequest.RequestCompleteHandler tokenRequestFinish = null; tokenRequestFinish = (result, exception) => {
                 tokenRequest.onFinish -= tokenRequestFinish;
@@ -295,7 +295,7 @@ namespace osum {
                 this._usernameCheckRunning                     = true;
                 usernameInputNotification.descriptionText.Text = "Checking username...";
 
-                StringNetRequest usernameDuplicateCheck = new StringNetRequest($"http://localhost:80/stream/arcade-username?username={sender.EnteredInput}");
+                StringNetRequest usernameDuplicateCheck = new StringNetRequest($"https://arcade.titanic.sh/stream/arcade-username?username={sender.EnteredInput}");
 
                 StringNetRequest.RequestCompleteHandler usernameDuplicateCheckComplete = null; usernameDuplicateCheckComplete = (result, exception) => {
                     usernameDuplicateCheck.onFinish -= usernameDuplicateCheckComplete;
@@ -363,7 +363,7 @@ namespace osum {
 
                 Notify(accountCreationHappening);
 
-                StringNetRequest accountCreationRequest = new StringNetRequest($"http://localhost:80/stream/arcade-register?username={username}&pin={sender.EnteredInput}&cardId={cardId}&cardType={cardType}&cardName={cardName}&machineKey={machineKey}");
+                StringNetRequest accountCreationRequest = new StringNetRequest($"https://arcade.titanic.sh/stream/arcade-register?username={username}&pin={sender.EnteredInput}&cardId={cardId}&cardType={cardType}&cardName={cardName}&machineKey={machineKey}");
 
                 StringNetRequest.RequestCompleteHandler accountCreationRequestComplete = null; accountCreationRequestComplete = (result, exception) => {
                     accountCreationRequest.onFinish -= accountCreationRequestComplete;

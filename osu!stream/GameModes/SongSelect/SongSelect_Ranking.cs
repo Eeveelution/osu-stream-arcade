@@ -48,7 +48,7 @@ namespace osum.GameModes.SongSelect
                                    "&ch="         + Player.Beatmap.Package.ContainerHash +
                                    "&difficulty=" + (int)Player.Difficulty;
 
-            rankingNetRequest = new StringNetRequest(@"http://localhost:80/stream/arcade-ranking?" + queryString);
+            rankingNetRequest = new StringNetRequest(@"https://arcade.titanic.sh/stream/arcade-ranking?" + queryString);
 
 
             rankingNetRequest.onFinish += rankingReceived;

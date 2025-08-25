@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using OpenTK;
 using OpenTK.Graphics;
@@ -401,7 +402,7 @@ namespace osum.GameModes.Results
                 GameBase.MainSpriteManager.Add(spriteSubmitting);
                 spriteSubmitting.FadeInFromZero(300);
 
-                StringNetRequest nr = new StringNetRequest("http://localhost:80/stream/arcade-score-submit", "POST", postString);
+                StringNetRequest nr = new StringNetRequest("https://arcade.titanic.sh/stream/arcade-score-submit", "POST", postString);
                 nr.onFinish += delegate(string result, Exception e)
                 {
                     spriteSubmitting.AlwaysDraw = false;
@@ -426,7 +427,7 @@ namespace osum.GameModes.Results
                         }
 
                         if (result.StartsWith("streams:")) {
-                            bool parsedSuccessfully = float.TryParse(result.Replace("streams:", ""), out float newStreams);
+                            bool parsedSuccessfully = double.TryParse(result.Replace("streams:", ""), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out double newStreams);
 
                             if (parsedSuccessfully) {
                                 ArcadeUserData.StatStreams = newStreams;

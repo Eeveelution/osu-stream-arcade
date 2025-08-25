@@ -35,8 +35,9 @@ namespace osum.GameModes.SongSelect
 #if !DIST
                 return false;
 #else
-                DifficultyScoreInfo sc = Player.Beatmap.BeatmapInfo.DifficultyScores[Difficulty.Normal];
-                return sc.HighScore == null || sc.HighScore.Ranking < Rank.A;
+return false;
+                // DifficultyScoreInfo sc = Player.Beatmap.BeatmapInfo.DifficultyScores[Difficulty.Normal];
+                // return sc.HighScore == null || sc.HighScore.Ranking < Rank.A;
 #endif
             }
         }

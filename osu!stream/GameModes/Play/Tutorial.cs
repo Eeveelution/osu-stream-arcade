@@ -55,7 +55,7 @@ namespace osum.GameModes.Play
             s_Demo = new pSprite(TextureManager.Load(OsuTexture.demo), new Vector2(0, 50)) { Alpha = 0, Field = FieldTypes.StandardSnapTopCentre, Origin = OriginTypes.Centre };
             spriteManager.Add(s_Demo);
 
-            Tutorial.IsDemoMode = true;
+            //Tutorial.IsDemoMode = true;
 
             if (IsDemoMode) {
                 Autoplay = true;

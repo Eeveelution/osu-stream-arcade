@@ -418,8 +418,10 @@ namespace osum
             this.drawTimeText = new pText("frame: 0.0ms (0fps)", 10, new Vector2(0, 0), 1.0f, true, Color4.White);
             this.updateTimeText = new pText("update: 0.0ms (0ups)", 10, new Vector2(0, 12), 1.0f, true, Color4.White);
 
+            #if DEBUG
             MainSpriteManager.Add(this.drawTimeText);
-            //MainSpriteManager.Add(this.updateTimeText);
+            #endif
+//MainSpriteManager.Add(this.updateTimeText);
 
             if (ArcadeUserData.CreditType == CreditType.Time) {
                 creditTimeText            = new pSpriteText("00.00", "default", -2, FieldTypes.Standard, OriginTypes.TopLeft, ClockTypes.Game, new Vector2(10, 10), 0.9f, true, Color4.White);
